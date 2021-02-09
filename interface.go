@@ -204,6 +204,9 @@ type Session interface {
 	// ReceiveMessage gets a message received in a datagram.
 	// See https://datatracker.ietf.org/doc/draft-pauly-quic-datagram/.
 	ReceiveMessage() ([]byte, error)
+
+	// GetSession exposes session
+	GetSession() *session
 }
 
 // An EarlySession is a session that is handshaking.

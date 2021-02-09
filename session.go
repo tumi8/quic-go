@@ -203,7 +203,7 @@ type session struct {
 	handshakeComplete     bool
 	handshakeConfirmed    bool
 
-	receivedRetry       bool
+	ReceivedRetry       bool
 	versionNegotiated   bool
 	receivedFirstPacket bool
 
@@ -216,7 +216,8 @@ type session struct {
 	// pacingDeadline is the time when the next packet should be sent
 	pacingDeadline time.Time
 
-	peerParams *wire.TransportParameters
+	// Exposes PeerParams
+	PeerParams *wire.TransportParameters
 
 	timer *utils.Timer
 	// keepAlivePingSent stores whether a keep alive PING is in flight.
@@ -717,7 +718,7 @@ func (s *session) Context() context.Context {
 }
 
 func (s *session) supportsDatagrams() bool {
-	return s.peerParams.MaxDatagramFrameSize != protocol.InvalidByteCount
+	return s.PeerParams.MaxDatagramFrameSize != protocol.InvalidByteCount
 }
 
 func (s *session) ConnectionState() ConnectionState {
@@ -815,7 +816,7 @@ func (s *session) handleHandshakeConfirmed() {
 	s.cryptoStreamHandler.SetHandshakeConfirmed()
 
 	if !s.config.DisablePathMTUDiscovery {
-		maxPacketSize := s.peerParams.MaxUDPPayloadSize
+		maxPacketSize := s.PeerParams.MaxUDPPayloadSize
 		if maxPacketSize == 0 {
 			maxPacketSize = protocol.MaxByteCount
 		}
@@ -1014,7 +1015,7 @@ func (s *session) handleRetryPacket(hdr *wire.Header, data []byte) bool /* was t
 	}
 	// If a token is already set, this means that we already received a Retry from the server.
 	// Ignore this Retry packet.
-	if s.receivedRetry {
+	if s.ReceivedRetry {
 		s.logger.Debugf("Ignoring Retry, since a Retry was already received.")
 		return false
 	}
@@ -1037,7 +1038,7 @@ func (s *session) handleRetryPacket(hdr *wire.Header, data []byte) bool /* was t
 		s.tracer.ReceivedRetry(hdr)
 	}
 	newDestConnID := hdr.SrcConnectionID
-	s.receivedRetry = true
+	s.ReceivedRetry = true
 	if err := s.sentPacketHandler.ResetForRetry(); err != nil {
 		s.closeLocal(err)
 		return false
@@ -1506,7 +1507,7 @@ func (s *session) restoreTransportParameters(params *wire.TransportParameters) {
 		s.logger.Debugf("Restoring Transport Parameters: %s", params)
 	}
 
-	s.peerParams = params
+	s.PeerParams = params
 	s.connIDGenerator.SetMaxActiveConnIDs(params.ActiveConnectionIDLimit)
 	s.connFlowController.UpdateSendWindow(params.InitialMaxData)
 	s.streamsMap.UpdateLimits(params)
@@ -1516,7 +1517,7 @@ func (s *session) handleTransportParameters(params *wire.TransportParameters) {
 	if err := s.checkTransportParameters(params); err != nil {
 		s.closeLocal(err)
 	}
-	s.peerParams = params
+	s.PeerParams = params
 	// On the client side we have to wait for handshake completion.
 	// During a 0-RTT connection, we are only allowed to use the new transport parameters for 1-RTT packets.
 	if s.perspective == protocol.PerspectiveServer {
@@ -1561,7 +1562,7 @@ func (s *session) checkTransportParameters(params *wire.TransportParameters) err
 }
 
 func (s *session) applyTransportParameters() {
-	params := s.peerParams
+	params := s.PeerParams
 	// Our local idle timeout will always be > 0.
 	s.idleTimeout = utils.MinNonZeroDuration(s.config.MaxIdleTimeout, params.MaxIdleTimeout)
 	s.keepAliveInterval = utils.MinDuration(s.idleTimeout/2, protocol.MaxKeepAliveInterval)
@@ -1829,12 +1830,12 @@ func (s *session) OpenUniStreamSync(ctx context.Context) (SendStream, error) {
 }
 
 func (s *session) newFlowController(id protocol.StreamID) flowcontrol.StreamFlowController {
-	initialSendWindow := s.peerParams.InitialMaxStreamDataUni
+	initialSendWindow := s.PeerParams.InitialMaxStreamDataUni
 	if id.Type() == protocol.StreamTypeBidi {
 		if id.InitiatedBy() == s.perspective {
-			initialSendWindow = s.peerParams.InitialMaxStreamDataBidiRemote
+			initialSendWindow = s.PeerParams.InitialMaxStreamDataBidiRemote
 		} else {
-			initialSendWindow = s.peerParams.InitialMaxStreamDataBidiLocal
+			initialSendWindow = s.PeerParams.InitialMaxStreamDataBidiLocal
 		}
 	}
 	return flowcontrol.NewStreamFlowController(
@@ -1903,7 +1904,7 @@ func (s *session) onStreamCompleted(id protocol.StreamID) {
 
 func (s *session) SendMessage(p []byte) error {
 	f := &wire.DatagramFrame{DataLenPresent: true}
-	if protocol.ByteCount(len(p)) > f.MaxDataLen(s.peerParams.MaxDatagramFrameSize, s.version) {
+	if protocol.ByteCount(len(p)) > f.MaxDataLen(s.PeerParams.MaxDatagramFrameSize, s.version) {
 		return errors.New("message too large")
 	}
 	f.Data = make([]byte, len(p))
@@ -1935,5 +1936,9 @@ func (s *session) GetVersion() protocol.VersionNumber {
 func (s *session) NextSession() Session {
 	<-s.HandshakeComplete().Done()
 	s.streamsMap.UseResetMaps()
+	return s
+}
+
+func (s *session) GetSession() *session {
 	return s
 }
