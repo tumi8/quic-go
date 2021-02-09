@@ -12,6 +12,7 @@ import (
 	"sync"
 	"time"
 
+	"gitlab.lrz.de/netintum/projects/gino/students/quic-go/logging"
 	"gitlab.lrz.de/netintum/projects/gino/students/quic-go/noninternal/ackhandler"
 	"gitlab.lrz.de/netintum/projects/gino/students/quic-go/noninternal/flowcontrol"
 	"gitlab.lrz.de/netintum/projects/gino/students/quic-go/noninternal/handshake"
@@ -20,7 +21,6 @@ import (
 	"gitlab.lrz.de/netintum/projects/gino/students/quic-go/noninternal/qerr"
 	"gitlab.lrz.de/netintum/projects/gino/students/quic-go/noninternal/utils"
 	"gitlab.lrz.de/netintum/projects/gino/students/quic-go/noninternal/wire"
-	"gitlab.lrz.de/netintum/projects/gino/students/quic-go/logging"
 	"gitlab.lrz.de/netintum/projects/gino/students/quic-go/quictrace"
 )
 
@@ -184,7 +184,7 @@ type session struct {
 	handshakeComplete     bool
 	handshakeConfirmed    bool
 
-	receivedRetry       bool
+	ReceivedRetry       bool
 	versionNegotiated   bool
 	receivedFirstPacket bool
 
@@ -197,7 +197,8 @@ type session struct {
 	// pacingDeadline is the time when the next packet should be sent
 	pacingDeadline time.Time
 
-	peerParams *wire.TransportParameters
+	// Exposes PeerParams
+	PeerParams *wire.TransportParameters
 
 	timer *utils.Timer
 	// keepAlivePingSent stores whether a keep alive PING is in flight.
@@ -896,7 +897,7 @@ func (s *session) handleRetryPacket(hdr *wire.Header, data []byte) bool /* was t
 	}
 	// If a token is already set, this means that we already received a Retry from the server.
 	// Ignore this Retry packet.
-	if s.receivedRetry {
+	if s.ReceivedRetry {
 		s.logger.Debugf("Ignoring Retry, since a Retry was already received.")
 		return false
 	}
@@ -919,7 +920,7 @@ func (s *session) handleRetryPacket(hdr *wire.Header, data []byte) bool /* was t
 		s.tracer.ReceivedRetry(hdr)
 	}
 	newDestConnID := hdr.SrcConnectionID
-	s.receivedRetry = true
+	s.ReceivedRetry = true
 	if err := s.sentPacketHandler.ResetForRetry(); err != nil {
 		s.closeLocal(err)
 		return false
@@ -1370,7 +1371,7 @@ func (s *session) restoreTransportParameters(params *wire.TransportParameters) {
 		s.logger.Debugf("Restoring Transport Parameters: %s", params)
 	}
 
-	s.peerParams = params
+	s.PeerParams = params
 	s.connIDGenerator.SetMaxActiveConnIDs(params.ActiveConnectionIDLimit)
 	s.connFlowController.UpdateSendWindow(params.InitialMaxData)
 	if err := s.streamsMap.UpdateLimits(params); err != nil {
@@ -1415,7 +1416,7 @@ func (s *session) processTransportParametersImpl(params *wire.TransportParameter
 		}
 	}
 
-	s.peerParams = params
+	s.PeerParams = params
 	// Our local idle timeout will always be > 0.
 	s.idleTimeout = utils.MinNonZeroDuration(s.config.MaxIdleTimeout, params.MaxIdleTimeout)
 	s.keepAliveInterval = utils.MinDuration(s.idleTimeout/2, protocol.MaxKeepAliveInterval)
@@ -1683,14 +1684,14 @@ func (s *session) OpenUniStreamSync(ctx context.Context) (SendStream, error) {
 
 func (s *session) newFlowController(id protocol.StreamID) flowcontrol.StreamFlowController {
 	var initialSendWindow protocol.ByteCount
-	if s.peerParams != nil {
+	if s.PeerParams != nil {
 		if id.Type() == protocol.StreamTypeUni {
-			initialSendWindow = s.peerParams.InitialMaxStreamDataUni
+			initialSendWindow = s.PeerParams.InitialMaxStreamDataUni
 		} else {
 			if id.InitiatedBy() == s.perspective {
-				initialSendWindow = s.peerParams.InitialMaxStreamDataBidiRemote
+				initialSendWindow = s.PeerParams.InitialMaxStreamDataBidiRemote
 			} else {
-				initialSendWindow = s.peerParams.InitialMaxStreamDataBidiLocal
+				initialSendWindow = s.PeerParams.InitialMaxStreamDataBidiLocal
 			}
 		}
 	}
@@ -1776,4 +1777,8 @@ func (s *session) getPerspective() protocol.Perspective {
 
 func (s *session) GetVersion() protocol.VersionNumber {
 	return s.version
+}
+
+func (s *session) GetSession() *session {
+	return s
 }

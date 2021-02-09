@@ -6,9 +6,9 @@ import (
 	"net"
 	"time"
 
+	"gitlab.lrz.de/netintum/projects/gino/students/quic-go/logging"
 	"gitlab.lrz.de/netintum/projects/gino/students/quic-go/noninternal/handshake"
 	"gitlab.lrz.de/netintum/projects/gino/students/quic-go/noninternal/protocol"
-	"gitlab.lrz.de/netintum/projects/gino/students/quic-go/logging"
 	"gitlab.lrz.de/netintum/projects/gino/students/quic-go/quictrace"
 )
 
@@ -190,6 +190,8 @@ type Session interface {
 	// It blocks until the handshake completes.
 	// Warning: This API should not be considered stable and might change soon.
 	ConnectionState() ConnectionState
+	// GetSession exposes session
+	GetSession() *session
 }
 
 // An EarlySession is a session that is handshaking.
