@@ -7,12 +7,12 @@ import (
 	"net"
 	"time"
 
-	"github.com/lucas-clemente/quic-go/internal/ackhandler"
-	"github.com/lucas-clemente/quic-go/internal/handshake"
-	"github.com/lucas-clemente/quic-go/internal/protocol"
-	"github.com/lucas-clemente/quic-go/internal/qerr"
-	"github.com/lucas-clemente/quic-go/internal/utils"
-	"github.com/lucas-clemente/quic-go/internal/wire"
+	"gitlab.lrz.de/netintum/projects/gino/students/quic-go/noninternal/ackhandler"
+	"gitlab.lrz.de/netintum/projects/gino/students/quic-go/noninternal/handshake"
+	"gitlab.lrz.de/netintum/projects/gino/students/quic-go/noninternal/protocol"
+	"gitlab.lrz.de/netintum/projects/gino/students/quic-go/noninternal/qerr"
+	"gitlab.lrz.de/netintum/projects/gino/students/quic-go/noninternal/utils"
+	"gitlab.lrz.de/netintum/projects/gino/students/quic-go/noninternal/wire"
 )
 
 type packer interface {

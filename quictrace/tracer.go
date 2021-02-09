@@ -8,9 +8,9 @@ import (
 
 	"google.golang.org/protobuf/proto"
 
-	"github.com/lucas-clemente/quic-go/internal/protocol"
-	"github.com/lucas-clemente/quic-go/internal/wire"
-	"github.com/lucas-clemente/quic-go/quictrace/pb"
+	"gitlab.lrz.de/netintum/projects/gino/students/quic-go/noninternal/protocol"
+	"gitlab.lrz.de/netintum/projects/gino/students/quic-go/noninternal/wire"
+	"gitlab.lrz.de/netintum/projects/gino/students/quic-go/quictrace/pb"
 )
 
 type traceEvent struct {

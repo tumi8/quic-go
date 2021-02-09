@@ -8,9 +8,9 @@ import (
 	"os"
 	"strings"
 
-	"github.com/lucas-clemente/quic-go/logging"
+	"gitlab.lrz.de/netintum/projects/gino/students/quic-go/logging"
 
-	"github.com/lucas-clemente/quic-go/internal/utils"
+	"gitlab.lrz.de/netintum/projects/gino/students/quic-go/noninternal/utils"
 )
 
 // GetSSLKeyLog creates a file for the TLS key log

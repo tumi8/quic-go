@@ -4,10 +4,10 @@ import (
 	"sync"
 	"time"
 
-	"github.com/lucas-clemente/quic-go/internal/ackhandler"
-	"github.com/lucas-clemente/quic-go/internal/flowcontrol"
-	"github.com/lucas-clemente/quic-go/internal/protocol"
-	"github.com/lucas-clemente/quic-go/internal/wire"
+	"gitlab.lrz.de/netintum/projects/gino/students/quic-go/noninternal/ackhandler"
+	"gitlab.lrz.de/netintum/projects/gino/students/quic-go/noninternal/flowcontrol"
+	"gitlab.lrz.de/netintum/projects/gino/students/quic-go/noninternal/protocol"
+	"gitlab.lrz.de/netintum/projects/gino/students/quic-go/noninternal/wire"
 )
 
 // The streamSender is notified by the stream about various events.

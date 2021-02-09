@@ -2,7 +2,7 @@
 
 package quictrace
 
-import "github.com/lucas-clemente/quic-go/internal/protocol"
+import "gitlab.lrz.de/netintum/projects/gino/students/quic-go/noninternal/protocol"
 
 // NewTracer returns a new Tracer that doesn't do anything.
 func NewTracer() Tracer {

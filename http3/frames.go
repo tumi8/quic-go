@@ -6,8 +6,8 @@ import (
 	"io"
 	"io/ioutil"
 
-	"github.com/lucas-clemente/quic-go/internal/protocol"
-	"github.com/lucas-clemente/quic-go/internal/utils"
+	"gitlab.lrz.de/netintum/projects/gino/students/quic-go/noninternal/protocol"
+	"gitlab.lrz.de/netintum/projects/gino/students/quic-go/noninternal/utils"
 )
 
 type byteReader interface {

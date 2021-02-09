@@ -4,7 +4,7 @@ import (
 	"net"
 
 	"github.com/golang/mock/gomock"
-	mocklogging "github.com/lucas-clemente/quic-go/internal/mocks/logging"
+	mocklogging "gitlab.lrz.de/netintum/projects/gino/students/quic-go/noninternal/mocks/logging"
 
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"

@@ -12,12 +12,12 @@ import (
 	"time"
 
 	"github.com/golang/mock/gomock"
-	quic "github.com/lucas-clemente/quic-go"
-	mockquic "github.com/lucas-clemente/quic-go/internal/mocks/quic"
+	quic "gitlab.lrz.de/netintum/projects/gino/students/quic-go"
+	mockquic "gitlab.lrz.de/netintum/projects/gino/students/quic-go/noninternal/mocks/quic"
 
-	"github.com/lucas-clemente/quic-go/internal/protocol"
-	"github.com/lucas-clemente/quic-go/internal/qtls"
-	"github.com/lucas-clemente/quic-go/internal/utils"
+	"gitlab.lrz.de/netintum/projects/gino/students/quic-go/noninternal/protocol"
+	"gitlab.lrz.de/netintum/projects/gino/students/quic-go/noninternal/qtls"
+	"gitlab.lrz.de/netintum/projects/gino/students/quic-go/noninternal/utils"
 	"github.com/marten-seemann/qpack"
 
 	. "github.com/onsi/ginkgo"

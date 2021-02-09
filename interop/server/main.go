@@ -8,11 +8,11 @@ import (
 	"net/http"
 	"os"
 
-	"github.com/lucas-clemente/quic-go"
-	"github.com/lucas-clemente/quic-go/http3"
-	"github.com/lucas-clemente/quic-go/interop/http09"
-	"github.com/lucas-clemente/quic-go/interop/utils"
-	"github.com/lucas-clemente/quic-go/qlog"
+	"gitlab.lrz.de/netintum/projects/gino/students/quic-go"
+	"gitlab.lrz.de/netintum/projects/gino/students/quic-go/http3"
+	"gitlab.lrz.de/netintum/projects/gino/students/quic-go/interop/http09"
+	"gitlab.lrz.de/netintum/projects/gino/students/quic-go/interop/utils"
+	"gitlab.lrz.de/netintum/projects/gino/students/quic-go/qlog"
 )
 
 var tlsConf *tls.Config

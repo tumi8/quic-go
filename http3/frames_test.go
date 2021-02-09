@@ -4,7 +4,7 @@ import (
 	"bytes"
 	"io"
 
-	"github.com/lucas-clemente/quic-go/internal/utils"
+	"gitlab.lrz.de/netintum/projects/gino/students/quic-go/noninternal/utils"
 
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"

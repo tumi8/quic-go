@@ -12,16 +12,16 @@ import (
 	"sync"
 	"time"
 
-	"github.com/lucas-clemente/quic-go/internal/ackhandler"
-	"github.com/lucas-clemente/quic-go/internal/flowcontrol"
-	"github.com/lucas-clemente/quic-go/internal/handshake"
-	"github.com/lucas-clemente/quic-go/internal/logutils"
-	"github.com/lucas-clemente/quic-go/internal/protocol"
-	"github.com/lucas-clemente/quic-go/internal/qerr"
-	"github.com/lucas-clemente/quic-go/internal/utils"
-	"github.com/lucas-clemente/quic-go/internal/wire"
-	"github.com/lucas-clemente/quic-go/logging"
-	"github.com/lucas-clemente/quic-go/quictrace"
+	"gitlab.lrz.de/netintum/projects/gino/students/quic-go/noninternal/ackhandler"
+	"gitlab.lrz.de/netintum/projects/gino/students/quic-go/noninternal/flowcontrol"
+	"gitlab.lrz.de/netintum/projects/gino/students/quic-go/noninternal/handshake"
+	"gitlab.lrz.de/netintum/projects/gino/students/quic-go/noninternal/logutils"
+	"gitlab.lrz.de/netintum/projects/gino/students/quic-go/noninternal/protocol"
+	"gitlab.lrz.de/netintum/projects/gino/students/quic-go/noninternal/qerr"
+	"gitlab.lrz.de/netintum/projects/gino/students/quic-go/noninternal/utils"
+	"gitlab.lrz.de/netintum/projects/gino/students/quic-go/noninternal/wire"
+	"gitlab.lrz.de/netintum/projects/gino/students/quic-go/logging"
+	"gitlab.lrz.de/netintum/projects/gino/students/quic-go/quictrace"
 )
 
 type unpacker interface {

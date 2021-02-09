@@ -8,8 +8,8 @@ import (
 	"net/http"
 	"net/http/httptest"
 
-	"github.com/lucas-clemente/quic-go"
-	"github.com/lucas-clemente/quic-go/internal/testdata"
+	"gitlab.lrz.de/netintum/projects/gino/students/quic-go"
+	"gitlab.lrz.de/netintum/projects/gino/students/quic-go/noninternal/testdata"
 
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"

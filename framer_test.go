@@ -3,12 +3,12 @@ package quic
 import (
 	"bytes"
 
-	"github.com/lucas-clemente/quic-go/internal/ackhandler"
+	"gitlab.lrz.de/netintum/projects/gino/students/quic-go/noninternal/ackhandler"
 
 	"github.com/golang/mock/gomock"
 
-	"github.com/lucas-clemente/quic-go/internal/protocol"
-	"github.com/lucas-clemente/quic-go/internal/wire"
+	"gitlab.lrz.de/netintum/projects/gino/students/quic-go/noninternal/protocol"
+	"gitlab.lrz.de/netintum/projects/gino/students/quic-go/noninternal/wire"
 
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"

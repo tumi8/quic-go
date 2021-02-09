@@ -7,16 +7,16 @@ import (
 	"net"
 	"time"
 
-	"github.com/lucas-clemente/quic-go/internal/qerr"
+	"gitlab.lrz.de/netintum/projects/gino/students/quic-go/noninternal/qerr"
 
-	"github.com/lucas-clemente/quic-go/internal/ackhandler"
+	"gitlab.lrz.de/netintum/projects/gino/students/quic-go/noninternal/ackhandler"
 
 	"github.com/golang/mock/gomock"
-	"github.com/lucas-clemente/quic-go/internal/handshake"
-	"github.com/lucas-clemente/quic-go/internal/mocks"
-	mockackhandler "github.com/lucas-clemente/quic-go/internal/mocks/ackhandler"
-	"github.com/lucas-clemente/quic-go/internal/protocol"
-	"github.com/lucas-clemente/quic-go/internal/wire"
+	"gitlab.lrz.de/netintum/projects/gino/students/quic-go/noninternal/handshake"
+	"gitlab.lrz.de/netintum/projects/gino/students/quic-go/noninternal/mocks"
+	mockackhandler "gitlab.lrz.de/netintum/projects/gino/students/quic-go/noninternal/mocks/ackhandler"
+	"gitlab.lrz.de/netintum/projects/gino/students/quic-go/noninternal/protocol"
+	"gitlab.lrz.de/netintum/projects/gino/students/quic-go/noninternal/wire"
 
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/ginkgo/extensions/table"
