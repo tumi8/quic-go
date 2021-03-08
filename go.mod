@@ -1,4 +1,4 @@
-module gitlab.lrz.de/netintum/projects/gino/students/quic-go
+module gitlab.lrz.de/netintum/projects/gino/students/quic-go.git
 
 go 1.14
 
