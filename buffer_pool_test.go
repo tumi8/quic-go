@@ -1,7 +1,7 @@
 package quic
 
 import (
-	"github.com/lucas-clemente/quic-go/internal/protocol"
+	"gitlab.lrz.de/netintum/projects/gino/students/quic-go/noninternal/protocol"
 
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"

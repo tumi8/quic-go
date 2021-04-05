@@ -6,8 +6,8 @@ import (
 	"reflect"
 	"time"
 
-	mocklogging "github.com/lucas-clemente/quic-go/internal/mocks/logging"
-	"github.com/lucas-clemente/quic-go/internal/protocol"
+	mocklogging "gitlab.lrz.de/netintum/projects/gino/students/quic-go/noninternal/mocks/logging"
+	"gitlab.lrz.de/netintum/projects/gino/students/quic-go/noninternal/protocol"
 
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"

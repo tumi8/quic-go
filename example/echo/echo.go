@@ -12,7 +12,7 @@ import (
 	"log"
 	"math/big"
 
-	quic "github.com/lucas-clemente/quic-go"
+	quic "gitlab.lrz.de/netintum/projects/gino/students/quic-go"
 )
 
 const addr = "localhost:4242"

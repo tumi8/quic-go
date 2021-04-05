@@ -13,10 +13,10 @@ import (
 	"sync/atomic"
 	"time"
 
-	quic "github.com/lucas-clemente/quic-go"
-	quicproxy "github.com/lucas-clemente/quic-go/integrationtests/tools/proxy"
-	"github.com/lucas-clemente/quic-go/internal/utils"
-	"github.com/lucas-clemente/quic-go/logging"
+	quic "gitlab.lrz.de/netintum/projects/gino/students/quic-go"
+	quicproxy "gitlab.lrz.de/netintum/projects/gino/students/quic-go/integrationtests/tools/proxy"
+	"gitlab.lrz.de/netintum/projects/gino/students/quic-go/noninternal/utils"
+	"gitlab.lrz.de/netintum/projects/gino/students/quic-go/logging"
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
 )
