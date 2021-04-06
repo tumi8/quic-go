@@ -9,7 +9,7 @@ import (
 	"net"
 	"unsafe"
 
-	qtls "github.com/marten-seemann/qtls-go1-16"
+	qtls "gitlab.lrz.de/netintum/projects/gino/students/quic-tls"
 )
 
 type (
@@ -88,7 +88,21 @@ func GetConnectionState(conn *Conn) ConnectionState {
 
 // ToTLSConnectionState extracts the tls.ConnectionState
 func ToTLSConnectionState(cs ConnectionState) tls.ConnectionState {
-	return cs.ConnectionState
+	connectionState := tls.ConnectionState{
+		Version:                     cs.ConnectionState.Version,
+		HandshakeComplete:           cs.ConnectionState.HandshakeComplete,
+		DidResume:                   cs.ConnectionState.DidResume,
+		CipherSuite:                 cs.ConnectionState.CipherSuite,
+		NegotiatedProtocol:          cs.ConnectionState.NegotiatedProtocol,
+		NegotiatedProtocolIsMutual:  cs.ConnectionState.NegotiatedProtocolIsMutual,
+		ServerName:                  cs.ConnectionState.ServerName,
+		PeerCertificates:            cs.ConnectionState.PeerCertificates,
+		VerifiedChains:              cs.ConnectionState.VerifiedChains,
+		SignedCertificateTimestamps: cs.ConnectionState.SignedCertificateTimestamps,
+		OCSPResponse:                cs.ConnectionState.OCSPResponse,
+		TLSUnique:                   cs.ConnectionState.TLSUnique,
+	}
+	return connectionState
 }
 
 type cipherSuiteTLS13 struct {
