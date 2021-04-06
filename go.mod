@@ -1,8 +1,6 @@
-module gitlab.lrz.de/netintum/projects/gino/students/quic-go
+module github.com/tumi8/quic-go
 
-go 1.14
-
-replace gitlab.lrz.de/netintum/projects/gino/students/quic-tls => gitlab.lrz.de/netintum/projects/gino/students/quic-tls.git v0.0.0-20210406153235-039aad39385d
+go 1.16
 
 require (
 	github.com/cheekybits/genny v1.0.0
@@ -12,7 +10,7 @@ require (
 	github.com/marten-seemann/qtls-go1-15 v0.1.4
 	github.com/onsi/ginkgo v1.14.0
 	github.com/onsi/gomega v1.10.1
-	gitlab.lrz.de/netintum/projects/gino/students/quic-tls v0.0.0-20210406153235-039aad39385d
+	github.com/tumi8/quic-tls v0.0.3
 	golang.org/x/crypto v0.0.0-20200622213623-75b288015ac9
 	golang.org/x/net v0.0.0-20200707034311-ab3426394381
 	golang.org/x/sync v0.0.0-20190911185100-cd5d95a43a6e

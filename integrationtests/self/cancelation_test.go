@@ -11,7 +11,7 @@ import (
 	"sync/atomic"
 	"time"
 
-	quic "gitlab.lrz.de/netintum/projects/gino/students/quic-go"
+	quic "github.com/tumi8/quic-go"
 
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"

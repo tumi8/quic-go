@@ -1,6 +1,6 @@
 package logging
 
-import "gitlab.lrz.de/netintum/projects/gino/students/quic-go/noninternal/wire"
+import "github.com/tumi8/quic-go/noninternal/wire"
 
 // A Frame is a QUIC frame
 type Frame interface{}
