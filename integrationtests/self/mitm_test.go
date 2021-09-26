@@ -3,6 +3,7 @@ package self_test
 import (
 	"bytes"
 	"context"
+	"errors"
 	"fmt"
 	"io/ioutil"
 	"math"
@@ -14,7 +15,6 @@ import (
 	quic "github.com/tumi8/quic-go"
 	quicproxy "github.com/tumi8/quic-go/integrationtests/tools/proxy"
 	"github.com/tumi8/quic-go/noninternal/protocol"
-	"github.com/tumi8/quic-go/noninternal/qerr"
 	"github.com/tumi8/quic-go/noninternal/testutils"
 	"github.com/tumi8/quic-go/noninternal/wire"
 	. "github.com/onsi/ginkgo"
@@ -371,7 +371,7 @@ var _ = Describe("MITM test", func() {
 					}
 					err := runTest(delayCb)
 					Expect(err).To(HaveOccurred())
-					Expect(err.Error()).To(ContainSubstring("no compatible QUIC version found"))
+					Expect(err).To(MatchError(&quic.VersionNegotiationError{}))
 				})
 
 				// times out, because client doesn't accept subsequent real retry packets from server
@@ -440,9 +440,10 @@ var _ = Describe("MITM test", func() {
 					}
 					err := runTest(delayCb)
 					Expect(err).To(HaveOccurred())
-					Expect(err).To(BeAssignableToTypeOf(&qerr.QuicError{}))
-					Expect(err.(*qerr.QuicError).ErrorCode).To(Equal(qerr.ProtocolViolation))
-					Expect(err.Error()).To(ContainSubstring("Received ACK for an unsent packet"))
+					var transportErr *quic.TransportError
+					Expect(errors.As(err, &transportErr)).To(BeTrue())
+					Expect(transportErr.ErrorCode).To(Equal(quic.ProtocolViolation))
+					Expect(transportErr.ErrorMessage).To(ContainSubstring("received ACK for an unsent packet"))
 				})
 			})
 		})

@@ -6,7 +6,7 @@ import (
 	quic "github.com/tumi8/quic-go"
 )
 
-type errorCode quic.ErrorCode
+type errorCode quic.ApplicationErrorCode
 
 const (
 	errorNoError              errorCode = 0x100

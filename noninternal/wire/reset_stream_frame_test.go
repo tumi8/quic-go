@@ -4,6 +4,7 @@ import (
 	"bytes"
 
 	"github.com/tumi8/quic-go/noninternal/protocol"
+	"github.com/tumi8/quic-go/noninternal/qerr"
 	"github.com/tumi8/quic-go/quicvarint"
 
 	. "github.com/onsi/ginkgo"
@@ -22,7 +23,7 @@ var _ = Describe("RESET_STREAM frame", func() {
 			Expect(err).ToNot(HaveOccurred())
 			Expect(frame.StreamID).To(Equal(protocol.StreamID(0xdeadbeef)))
 			Expect(frame.FinalSize).To(Equal(protocol.ByteCount(0x987654321)))
-			Expect(frame.ErrorCode).To(Equal(protocol.ApplicationErrorCode(0x1337)))
+			Expect(frame.ErrorCode).To(Equal(qerr.StreamErrorCode(0x1337)))
 		})
 
 		It("errors on EOFs", func() {

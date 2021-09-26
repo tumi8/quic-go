@@ -86,7 +86,6 @@ var _ = Describe("Handshake RTT tests", func() {
 			clientConfig,
 		)
 		Expect(err).To(HaveOccurred())
-		// Expect(err.(qerr.ErrorCode)).To(Equal(qerr.InvalidVersion))
 		expectDurationInRTTs(1)
 	})
 

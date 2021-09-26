@@ -7,9 +7,11 @@ import (
 	"net"
 	"time"
 
+
 	quic "github.com/tumi8/quic-go"
 	quicproxy "github.com/tumi8/quic-go/integrationtests/tools/proxy"
 	"github.com/tumi8/quic-go/noninternal/utils"
+
 
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
@@ -99,8 +101,7 @@ var _ = Describe("Stateless Resets", func() {
 				_, serr = str.Read([]byte{0})
 			}
 			Expect(serr).To(HaveOccurred())
-			Expect(serr.Error()).To(ContainSubstring("INTERNAL_ERROR: received a stateless reset"))
-
+			Expect(serr).To(MatchError(&quic.StatelessResetError{}))
 			Expect(ln2.Close()).To(Succeed())
 			Eventually(acceptStopped).Should(BeClosed())
 		})
