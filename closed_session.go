@@ -3,8 +3,8 @@ package quic
 import (
 	"sync"
 
-	"github.com/tumi8/quic-go/noninternal/protocol"
-	"github.com/tumi8/quic-go/noninternal/utils"
+	"gitlab.lrz.de/netintum/projects/gino/students/quic-go/noninternal/protocol"
+	"gitlab.lrz.de/netintum/projects/gino/students/quic-go/noninternal/utils"
 )
 
 // A closedLocalSession is a session that we closed locally.

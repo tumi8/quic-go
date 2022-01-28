@@ -1,6 +1,6 @@
 package ackhandler
 
-import "github.com/tumi8/quic-go/noninternal/wire"
+import "gitlab.lrz.de/netintum/projects/gino/students/quic-go/noninternal/wire"
 
 // IsFrameAckEliciting returns true if the frame is ack-eliciting.
 func IsFrameAckEliciting(f wire.Frame) bool {

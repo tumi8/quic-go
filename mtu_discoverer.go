@@ -3,10 +3,10 @@ package quic
 import (
 	"time"
 
-	"github.com/tumi8/quic-go/noninternal/ackhandler"
-	"github.com/tumi8/quic-go/noninternal/protocol"
-	"github.com/tumi8/quic-go/noninternal/utils"
-	"github.com/tumi8/quic-go/noninternal/wire"
+	"gitlab.lrz.de/netintum/projects/gino/students/quic-go/noninternal/ackhandler"
+	"gitlab.lrz.de/netintum/projects/gino/students/quic-go/noninternal/protocol"
+	"gitlab.lrz.de/netintum/projects/gino/students/quic-go/noninternal/utils"
+	"gitlab.lrz.de/netintum/projects/gino/students/quic-go/noninternal/wire"
 )
 
 type mtuDiscoverer interface {

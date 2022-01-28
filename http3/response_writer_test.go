@@ -5,8 +5,8 @@ import (
 	"io"
 	"net/http"
 
-	mockquic "github.com/tumi8/quic-go/noninternal/mocks/quic"
-	"github.com/tumi8/quic-go/noninternal/utils"
+	mockquic "gitlab.lrz.de/netintum/projects/gino/students/quic-go/noninternal/mocks/quic"
+	"gitlab.lrz.de/netintum/projects/gino/students/quic-go/noninternal/utils"
 
 	"github.com/golang/mock/gomock"
 	"github.com/marten-seemann/qpack"

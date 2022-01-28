@@ -5,8 +5,8 @@ import (
 	"crypto/rand"
 	"errors"
 
-	"github.com/tumi8/quic-go/noninternal/protocol"
-	"github.com/tumi8/quic-go/noninternal/utils"
+	"gitlab.lrz.de/netintum/projects/gino/students/quic-go/noninternal/protocol"
+	"gitlab.lrz.de/netintum/projects/gino/students/quic-go/noninternal/utils"
 )
 
 // ParseVersionNegotiationPacket parses a Version Negotiation packet.

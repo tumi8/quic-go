@@ -9,10 +9,10 @@ import (
 	"net"
 	"time"
 
-	quic "github.com/tumi8/quic-go"
-	"github.com/tumi8/quic-go/integrationtests/tools/israce"
-	"github.com/tumi8/quic-go/noninternal/protocol"
-	"github.com/tumi8/quic-go/logging"
+	quic "gitlab.lrz.de/netintum/projects/gino/students/quic-go"
+	"gitlab.lrz.de/netintum/projects/gino/students/quic-go/integrationtests/tools/israce"
+	"gitlab.lrz.de/netintum/projects/gino/students/quic-go/noninternal/protocol"
+	"gitlab.lrz.de/netintum/projects/gino/students/quic-go/logging"
 
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"

@@ -8,11 +8,11 @@ import (
 	"net/http"
 	"os"
 
-	"github.com/tumi8/quic-go"
-	"github.com/tumi8/quic-go/http3"
-	"github.com/tumi8/quic-go/interop/http09"
-	"github.com/tumi8/quic-go/interop/utils"
-	"github.com/tumi8/quic-go/qlog"
+	"gitlab.lrz.de/netintum/projects/gino/students/quic-go"
+	"gitlab.lrz.de/netintum/projects/gino/students/quic-go/http3"
+	"gitlab.lrz.de/netintum/projects/gino/students/quic-go/interop/http09"
+	"gitlab.lrz.de/netintum/projects/gino/students/quic-go/interop/utils"
+	"gitlab.lrz.de/netintum/projects/gino/students/quic-go/qlog"
 )
 
 var tlsConf *tls.Config

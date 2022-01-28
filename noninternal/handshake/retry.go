@@ -7,7 +7,7 @@ import (
 	"fmt"
 	"sync"
 
-	"github.com/tumi8/quic-go/noninternal/protocol"
+	"gitlab.lrz.de/netintum/projects/gino/students/quic-go/noninternal/protocol"
 )
 
 var (

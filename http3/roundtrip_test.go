@@ -10,8 +10,8 @@ import (
 	"time"
 
 	"github.com/golang/mock/gomock"
-	quic "github.com/tumi8/quic-go"
-	mockquic "github.com/tumi8/quic-go/noninternal/mocks/quic"
+	quic "gitlab.lrz.de/netintum/projects/gino/students/quic-go"
+	mockquic "gitlab.lrz.de/netintum/projects/gino/students/quic-go/noninternal/mocks/quic"
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
 )

@@ -6,10 +6,10 @@ import (
 	"math/rand"
 	"time"
 
-	"github.com/tumi8/quic-go"
-	"github.com/tumi8/quic-go/fuzzing/internal/helper"
-	"github.com/tumi8/quic-go/noninternal/protocol"
-	"github.com/tumi8/quic-go/noninternal/wire"
+	"gitlab.lrz.de/netintum/projects/gino/students/quic-go"
+	"gitlab.lrz.de/netintum/projects/gino/students/quic-go/fuzzing/internal/helper"
+	"gitlab.lrz.de/netintum/projects/gino/students/quic-go/noninternal/protocol"
+	"gitlab.lrz.de/netintum/projects/gino/students/quic-go/noninternal/wire"
 )
 
 const version = protocol.VersionTLS

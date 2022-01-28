@@ -1,6 +1,6 @@
 package wire
 
-import "github.com/tumi8/quic-go/noninternal/protocol"
+import "gitlab.lrz.de/netintum/projects/gino/students/quic-go/noninternal/protocol"
 
 // AckRange is an ACK range
 type AckRange struct {

@@ -8,9 +8,9 @@ import (
 	"time"
 
 
-	quic "github.com/tumi8/quic-go"
-	quicproxy "github.com/tumi8/quic-go/integrationtests/tools/proxy"
-	"github.com/tumi8/quic-go/noninternal/utils"
+	quic "gitlab.lrz.de/netintum/projects/gino/students/quic-go"
+	quicproxy "gitlab.lrz.de/netintum/projects/gino/students/quic-go/integrationtests/tools/proxy"
+	"gitlab.lrz.de/netintum/projects/gino/students/quic-go/noninternal/utils"
 
 
 	. "github.com/onsi/ginkgo"

@@ -12,10 +12,10 @@ import (
 	"sync"
 	"time"
 
-	"github.com/tumi8/quic-go/noninternal/protocol"
-	"github.com/tumi8/quic-go/noninternal/utils"
-	"github.com/tumi8/quic-go/noninternal/wire"
-	"github.com/tumi8/quic-go/logging"
+	"gitlab.lrz.de/netintum/projects/gino/students/quic-go/noninternal/protocol"
+	"gitlab.lrz.de/netintum/projects/gino/students/quic-go/noninternal/utils"
+	"gitlab.lrz.de/netintum/projects/gino/students/quic-go/noninternal/wire"
+	"gitlab.lrz.de/netintum/projects/gino/students/quic-go/logging"
 )
 
 type zeroRTTQueue struct {
@@ -122,7 +122,7 @@ func newPacketHandlerMap(
 ) (packetHandlerManager, error) {
 	if err := setReceiveBuffer(c, logger); err != nil {
 		receiveBufferWarningOnce.Do(func() {
-			log.Printf("%s. See https://github.com/tumi8/quic-go/wiki/UDP-Receive-Buffer-Size for details.", err)
+			log.Printf("%s. See https://gitlab.lrz.de/netintum/projects/gino/students/quic-go/wiki/UDP-Receive-Buffer-Size for details.", err)
 		})
 	}
 	conn, err := wrapConn(c)

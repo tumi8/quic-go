@@ -8,7 +8,7 @@ import (
 	reflect "reflect"
 
 	gomock "github.com/golang/mock/gomock"
-	protocol "github.com/tumi8/quic-go/noninternal/protocol"
+	protocol "gitlab.lrz.de/netintum/projects/gino/students/quic-go/noninternal/protocol"
 )
 
 // MockStreamGetter is a mock of StreamGetter interface.
