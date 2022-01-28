@@ -305,6 +305,10 @@ type Config struct {
 	// Datagrams will only be available when both peers enable datagram support.
 	EnableDatagrams bool
 	Tracer          logging.Tracer
+
+	// Custom TUM extension
+	SCID protocol.ConnectionID
+	DCID protocol.ConnectionID
 }
 
 // ConnectionState records basic details about a QUIC connection

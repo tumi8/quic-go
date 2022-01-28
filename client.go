@@ -254,13 +254,24 @@ func newClient(
 		}
 	}
 
-	srcConnID, err := generateConnectionID(config.ConnectionIDLength)
-	if err != nil {
-		return nil, err
+	var srcConnID, destConnID protocol.ConnectionID
+	var err error
+	if config.SCID != nil {
+		srcConnID = config.SCID
+	} else {
+		srcConnID, err = generateConnectionID(config.ConnectionIDLength)
+		if err != nil {
+			return nil, err
+		}
 	}
-	destConnID, err := generateConnectionIDForInitial()
-	if err != nil {
-		return nil, err
+
+	if config.DCID != nil {
+		destConnID = config.DCID
+	} else {
+		destConnID, err = generateConnectionIDForInitial()
+		if err != nil {
+			return nil, err
+		}
 	}
 	c := &client{
 		srcConnID:         srcConnID,
