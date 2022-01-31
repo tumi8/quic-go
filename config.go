@@ -100,6 +100,8 @@ func populateConfig(config *Config) *Config {
 		maxIncomingUniStreams = 0
 	}
 
+	# TODO add scid/dcid
+
 	return &Config{
 		Versions:                       versions,
 		HandshakeIdleTimeout:           handshakeIdleTimeout,
@@ -118,5 +120,7 @@ func populateConfig(config *Config) *Config {
 		EnableDatagrams:                config.EnableDatagrams,
 		DisablePathMTUDiscovery:        config.DisablePathMTUDiscovery,
 		Tracer:                         config.Tracer,
+		SCID:							config.SCID,
+		DCID:							config.DCID,
 	}
 }
