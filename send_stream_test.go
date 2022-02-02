@@ -9,10 +9,10 @@ import (
 	"time"
 
 	"github.com/golang/mock/gomock"
-	"gitlab.lrz.de/netintum/projects/gino/students/quic-go/noninternal/ackhandler"
-	"gitlab.lrz.de/netintum/projects/gino/students/quic-go/noninternal/mocks"
-	"gitlab.lrz.de/netintum/projects/gino/students/quic-go/noninternal/protocol"
-	"gitlab.lrz.de/netintum/projects/gino/students/quic-go/noninternal/wire"
+	"github.com/zirngibl/quic-go/noninternal/ackhandler"
+	"github.com/zirngibl/quic-go/noninternal/mocks"
+	"github.com/zirngibl/quic-go/noninternal/protocol"
+	"github.com/zirngibl/quic-go/noninternal/wire"
 
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"

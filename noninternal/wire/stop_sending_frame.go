@@ -3,9 +3,9 @@ package wire
 import (
 	"bytes"
 
-	"gitlab.lrz.de/netintum/projects/gino/students/quic-go/noninternal/protocol"
-	"gitlab.lrz.de/netintum/projects/gino/students/quic-go/noninternal/qerr"
-	"gitlab.lrz.de/netintum/projects/gino/students/quic-go/quicvarint"
+	"github.com/zirngibl/quic-go/noninternal/protocol"
+	"github.com/zirngibl/quic-go/noninternal/qerr"
+	"github.com/zirngibl/quic-go/quicvarint"
 )
 
 // A StopSendingFrame is a STOP_SENDING frame

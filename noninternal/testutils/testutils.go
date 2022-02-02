@@ -3,9 +3,9 @@ package testutils
 import (
 	"bytes"
 
-	"gitlab.lrz.de/netintum/projects/gino/students/quic-go/noninternal/handshake"
-	"gitlab.lrz.de/netintum/projects/gino/students/quic-go/noninternal/protocol"
-	"gitlab.lrz.de/netintum/projects/gino/students/quic-go/noninternal/wire"
+	"github.com/zirngibl/quic-go/noninternal/handshake"
+	"github.com/zirngibl/quic-go/noninternal/protocol"
+	"github.com/zirngibl/quic-go/noninternal/wire"
 )
 
 // Utilities for simulating packet injection and man-in-the-middle (MITM) attacker tests.

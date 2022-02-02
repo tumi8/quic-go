@@ -1,9 +1,9 @@
 package ackhandler
 
 import (
-	"gitlab.lrz.de/netintum/projects/gino/students/quic-go/noninternal/protocol"
-	"gitlab.lrz.de/netintum/projects/gino/students/quic-go/noninternal/utils"
-	"gitlab.lrz.de/netintum/projects/gino/students/quic-go/noninternal/wire"
+	"github.com/zirngibl/quic-go/noninternal/protocol"
+	"github.com/zirngibl/quic-go/noninternal/utils"
+	"github.com/zirngibl/quic-go/noninternal/wire"
 )
 
 // The receivedPacketHistory stores if a packet number has already been received.

@@ -1,6 +1,6 @@
 package ackhandler
 
-import "gitlab.lrz.de/netintum/projects/gino/students/quic-go/noninternal/wire"
+import "github.com/zirngibl/quic-go/noninternal/wire"
 
 type Frame struct {
 	wire.Frame // nil if the frame has already been acknowledged in another packet

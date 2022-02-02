@@ -4,9 +4,9 @@ import (
 	"errors"
 	"time"
 
-	"gitlab.lrz.de/netintum/projects/gino/students/quic-go/noninternal/utils"
+	"github.com/zirngibl/quic-go/noninternal/utils"
 
-	"gitlab.lrz.de/netintum/projects/gino/students/quic-go/noninternal/protocol"
+	"github.com/zirngibl/quic-go/noninternal/protocol"
 )
 
 // Clone clones a Config
@@ -99,8 +99,6 @@ func populateConfig(config *Config) *Config {
 	} else if maxIncomingUniStreams < 0 {
 		maxIncomingUniStreams = 0
 	}
-
-	# TODO add scid/dcid
 
 	return &Config{
 		Versions:                       versions,

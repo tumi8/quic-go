@@ -4,7 +4,7 @@ import (
 	"container/list"
 	"sync"
 
-	"gitlab.lrz.de/netintum/projects/gino/students/quic-go/noninternal/utils"
+	"github.com/zirngibl/quic-go/noninternal/utils"
 )
 
 type singleOriginTokenStore struct {

@@ -7,8 +7,8 @@ import (
 	"net"
 	"sync"
 
-	quic "gitlab.lrz.de/netintum/projects/gino/students/quic-go"
-	"gitlab.lrz.de/netintum/projects/gino/students/quic-go/noninternal/protocol"
+	quic "github.com/zirngibl/quic-go"
+	"github.com/zirngibl/quic-go/noninternal/protocol"
 
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"

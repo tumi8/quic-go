@@ -4,8 +4,8 @@ import (
 	"bytes"
 	"io"
 
-	"gitlab.lrz.de/netintum/projects/gino/students/quic-go/noninternal/protocol"
-	"gitlab.lrz.de/netintum/projects/gino/students/quic-go/quicvarint"
+	"github.com/zirngibl/quic-go/noninternal/protocol"
+	"github.com/zirngibl/quic-go/quicvarint"
 )
 
 // A DatagramFrame is a DATAGRAM frame

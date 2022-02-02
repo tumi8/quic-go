@@ -1,6 +1,6 @@
 package flowcontrol
 
-import "gitlab.lrz.de/netintum/projects/gino/students/quic-go/noninternal/protocol"
+import "github.com/zirngibl/quic-go/noninternal/protocol"
 
 type flowController interface {
 	// for sending

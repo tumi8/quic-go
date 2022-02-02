@@ -8,8 +8,8 @@ import (
 	"context"
 	"sync"
 
-	"gitlab.lrz.de/netintum/projects/gino/students/quic-go/noninternal/protocol"
-	"gitlab.lrz.de/netintum/projects/gino/students/quic-go/noninternal/wire"
+	"github.com/zirngibl/quic-go/noninternal/protocol"
+	"github.com/zirngibl/quic-go/noninternal/wire"
 )
 
 // When a stream is deleted before it was accepted, we can't delete it from the map immediately.

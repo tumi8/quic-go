@@ -13,7 +13,7 @@ import (
 	"strings"
 	"sync"
 
-	"gitlab.lrz.de/netintum/projects/gino/students/quic-go"
+	"github.com/zirngibl/quic-go"
 )
 
 const h09alpn = "hq-interop"

@@ -18,12 +18,12 @@ import (
 
 	_ "net/http/pprof"
 
-	"gitlab.lrz.de/netintum/projects/gino/students/quic-go"
-	"gitlab.lrz.de/netintum/projects/gino/students/quic-go/http3"
-	"gitlab.lrz.de/netintum/projects/gino/students/quic-go/noninternal/testdata"
-	"gitlab.lrz.de/netintum/projects/gino/students/quic-go/noninternal/utils"
-	"gitlab.lrz.de/netintum/projects/gino/students/quic-go/logging"
-	"gitlab.lrz.de/netintum/projects/gino/students/quic-go/qlog"
+	"github.com/zirngibl/quic-go"
+	"github.com/zirngibl/quic-go/http3"
+	"github.com/zirngibl/quic-go/noninternal/testdata"
+	"github.com/zirngibl/quic-go/noninternal/utils"
+	"github.com/zirngibl/quic-go/logging"
+	"github.com/zirngibl/quic-go/qlog"
 )
 
 type binds []string

@@ -6,9 +6,9 @@ import (
 	"net"
 	"time"
 
-	"gitlab.lrz.de/netintum/projects/gino/students/quic-go"
-	quicproxy "gitlab.lrz.de/netintum/projects/gino/students/quic-go/integrationtests/tools/proxy"
-	"gitlab.lrz.de/netintum/projects/gino/students/quic-go/logging"
+	"github.com/zirngibl/quic-go"
+	quicproxy "github.com/zirngibl/quic-go/integrationtests/tools/proxy"
+	"github.com/zirngibl/quic-go/logging"
 
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"

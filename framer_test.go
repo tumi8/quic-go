@@ -4,9 +4,9 @@ import (
 	"bytes"
 	"math/rand"
 
-	"gitlab.lrz.de/netintum/projects/gino/students/quic-go/noninternal/ackhandler"
-	"gitlab.lrz.de/netintum/projects/gino/students/quic-go/noninternal/protocol"
-	"gitlab.lrz.de/netintum/projects/gino/students/quic-go/noninternal/wire"
+	"github.com/zirngibl/quic-go/noninternal/ackhandler"
+	"github.com/zirngibl/quic-go/noninternal/protocol"
+	"github.com/zirngibl/quic-go/noninternal/wire"
 
 	"github.com/golang/mock/gomock"
 

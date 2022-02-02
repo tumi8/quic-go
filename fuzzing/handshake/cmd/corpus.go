@@ -4,13 +4,13 @@ import (
 	"crypto/tls"
 	"log"
 
-	fuzzhandshake "gitlab.lrz.de/netintum/projects/gino/students/quic-go/fuzzing/handshake"
-	"gitlab.lrz.de/netintum/projects/gino/students/quic-go/fuzzing/internal/helper"
-	"gitlab.lrz.de/netintum/projects/gino/students/quic-go/noninternal/handshake"
-	"gitlab.lrz.de/netintum/projects/gino/students/quic-go/noninternal/protocol"
-	"gitlab.lrz.de/netintum/projects/gino/students/quic-go/noninternal/testdata"
-	"gitlab.lrz.de/netintum/projects/gino/students/quic-go/noninternal/utils"
-	"gitlab.lrz.de/netintum/projects/gino/students/quic-go/noninternal/wire"
+	fuzzhandshake "github.com/zirngibl/quic-go/fuzzing/handshake"
+	"github.com/zirngibl/quic-go/fuzzing/internal/helper"
+	"github.com/zirngibl/quic-go/noninternal/handshake"
+	"github.com/zirngibl/quic-go/noninternal/protocol"
+	"github.com/zirngibl/quic-go/noninternal/testdata"
+	"github.com/zirngibl/quic-go/noninternal/utils"
+	"github.com/zirngibl/quic-go/noninternal/wire"
 )
 
 type chunk struct {

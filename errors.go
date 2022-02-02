@@ -3,7 +3,7 @@ package quic
 import (
 	"fmt"
 
-	"gitlab.lrz.de/netintum/projects/gino/students/quic-go/noninternal/qerr"
+	"github.com/zirngibl/quic-go/noninternal/qerr"
 )
 
 type (

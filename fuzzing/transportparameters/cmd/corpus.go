@@ -8,11 +8,11 @@ import (
 	"net"
 	"time"
 
-	"gitlab.lrz.de/netintum/projects/gino/students/quic-go/fuzzing/internal/helper"
-	"gitlab.lrz.de/netintum/projects/gino/students/quic-go/fuzzing/transportparameters"
-	"gitlab.lrz.de/netintum/projects/gino/students/quic-go/noninternal/protocol"
+	"github.com/zirngibl/quic-go/fuzzing/internal/helper"
+	"github.com/zirngibl/quic-go/fuzzing/transportparameters"
+	"github.com/zirngibl/quic-go/noninternal/protocol"
 
-	"gitlab.lrz.de/netintum/projects/gino/students/quic-go/noninternal/wire"
+	"github.com/zirngibl/quic-go/noninternal/wire"
 )
 
 func getRandomData(l int) []byte {

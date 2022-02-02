@@ -3,9 +3,9 @@ package qlog
 import (
 	"fmt"
 
-	"gitlab.lrz.de/netintum/projects/gino/students/quic-go/noninternal/protocol"
-	"gitlab.lrz.de/netintum/projects/gino/students/quic-go/noninternal/qerr"
-	"gitlab.lrz.de/netintum/projects/gino/students/quic-go/logging"
+	"github.com/zirngibl/quic-go/noninternal/protocol"
+	"github.com/zirngibl/quic-go/noninternal/qerr"
+	"github.com/zirngibl/quic-go/logging"
 )
 
 type owner uint8

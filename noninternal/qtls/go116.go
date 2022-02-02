@@ -10,7 +10,7 @@ import (
 	"net"
 	"unsafe"
 
-	qtls "gitlab.lrz.de/netintum/projects/gino/students/quic-tls"
+	qtls "github.com/zirngibl/quic-tls"
 )
 
 type (

@@ -3,7 +3,7 @@ package wire
 import (
 	"bytes"
 
-	"gitlab.lrz.de/netintum/projects/gino/students/quic-go/noninternal/protocol"
+	"github.com/zirngibl/quic-go/noninternal/protocol"
 )
 
 // A PingFrame is a PING frame

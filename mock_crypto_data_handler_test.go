@@ -8,7 +8,7 @@ import (
 	reflect "reflect"
 
 	gomock "github.com/golang/mock/gomock"
-	protocol "gitlab.lrz.de/netintum/projects/gino/students/quic-go/noninternal/protocol"
+	protocol "github.com/zirngibl/quic-go/noninternal/protocol"
 )
 
 // MockCryptoDataHandler is a mock of CryptoDataHandler interface.

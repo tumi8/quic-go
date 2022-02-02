@@ -1,8 +1,8 @@
 package logutils
 
 import (
-	"gitlab.lrz.de/netintum/projects/gino/students/quic-go/noninternal/wire"
-	"gitlab.lrz.de/netintum/projects/gino/students/quic-go/logging"
+	"github.com/zirngibl/quic-go/noninternal/wire"
+	"github.com/zirngibl/quic-go/logging"
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
 )

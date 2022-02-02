@@ -8,10 +8,10 @@ import (
 	reflect "reflect"
 
 	gomock "github.com/golang/mock/gomock"
-	ackhandler "gitlab.lrz.de/netintum/projects/gino/students/quic-go/noninternal/ackhandler"
-	protocol "gitlab.lrz.de/netintum/projects/gino/students/quic-go/noninternal/protocol"
-	qerr "gitlab.lrz.de/netintum/projects/gino/students/quic-go/noninternal/qerr"
-	wire "gitlab.lrz.de/netintum/projects/gino/students/quic-go/noninternal/wire"
+	ackhandler "github.com/zirngibl/quic-go/noninternal/ackhandler"
+	protocol "github.com/zirngibl/quic-go/noninternal/protocol"
+	qerr "github.com/zirngibl/quic-go/noninternal/qerr"
+	wire "github.com/zirngibl/quic-go/noninternal/wire"
 )
 
 // MockPacker is a mock of Packer interface.

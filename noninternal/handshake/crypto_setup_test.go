@@ -10,12 +10,12 @@ import (
 	"math/big"
 	"time"
 
-	mocktls "gitlab.lrz.de/netintum/projects/gino/students/quic-go/noninternal/mocks/tls"
-	"gitlab.lrz.de/netintum/projects/gino/students/quic-go/noninternal/protocol"
-	"gitlab.lrz.de/netintum/projects/gino/students/quic-go/noninternal/qerr"
-	"gitlab.lrz.de/netintum/projects/gino/students/quic-go/noninternal/testdata"
-	"gitlab.lrz.de/netintum/projects/gino/students/quic-go/noninternal/utils"
-	"gitlab.lrz.de/netintum/projects/gino/students/quic-go/noninternal/wire"
+	mocktls "github.com/zirngibl/quic-go/noninternal/mocks/tls"
+	"github.com/zirngibl/quic-go/noninternal/protocol"
+	"github.com/zirngibl/quic-go/noninternal/qerr"
+	"github.com/zirngibl/quic-go/noninternal/testdata"
+	"github.com/zirngibl/quic-go/noninternal/utils"
+	"github.com/zirngibl/quic-go/noninternal/wire"
 
 	"github.com/golang/mock/gomock"
 

@@ -4,9 +4,9 @@ import (
 	"crypto/cipher"
 	"encoding/binary"
 
-	"gitlab.lrz.de/netintum/projects/gino/students/quic-go/noninternal/protocol"
-	"gitlab.lrz.de/netintum/projects/gino/students/quic-go/noninternal/qtls"
-	"gitlab.lrz.de/netintum/projects/gino/students/quic-go/noninternal/utils"
+	"github.com/zirngibl/quic-go/noninternal/protocol"
+	"github.com/zirngibl/quic-go/noninternal/qtls"
+	"github.com/zirngibl/quic-go/noninternal/utils"
 )
 
 func createAEAD(suite *qtls.CipherSuiteTLS13, trafficSecret []byte) cipher.AEAD {

@@ -6,13 +6,13 @@ import (
 	"sync"
 	"time"
 
-	"gitlab.lrz.de/netintum/projects/gino/students/quic-go/noninternal/ackhandler"
+	"github.com/zirngibl/quic-go/noninternal/ackhandler"
 
-	"gitlab.lrz.de/netintum/projects/gino/students/quic-go/noninternal/flowcontrol"
-	"gitlab.lrz.de/netintum/projects/gino/students/quic-go/noninternal/protocol"
-	"gitlab.lrz.de/netintum/projects/gino/students/quic-go/noninternal/qerr"
-	"gitlab.lrz.de/netintum/projects/gino/students/quic-go/noninternal/utils"
-	"gitlab.lrz.de/netintum/projects/gino/students/quic-go/noninternal/wire"
+	"github.com/zirngibl/quic-go/noninternal/flowcontrol"
+	"github.com/zirngibl/quic-go/noninternal/protocol"
+	"github.com/zirngibl/quic-go/noninternal/qerr"
+	"github.com/zirngibl/quic-go/noninternal/utils"
+	"github.com/zirngibl/quic-go/noninternal/wire"
 )
 
 type sendStreamI interface {

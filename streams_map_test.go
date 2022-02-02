@@ -7,11 +7,11 @@ import (
 	"net"
 
 	"github.com/golang/mock/gomock"
-	"gitlab.lrz.de/netintum/projects/gino/students/quic-go/noninternal/flowcontrol"
-	"gitlab.lrz.de/netintum/projects/gino/students/quic-go/noninternal/mocks"
-	"gitlab.lrz.de/netintum/projects/gino/students/quic-go/noninternal/protocol"
-	"gitlab.lrz.de/netintum/projects/gino/students/quic-go/noninternal/qerr"
-	"gitlab.lrz.de/netintum/projects/gino/students/quic-go/noninternal/wire"
+	"github.com/zirngibl/quic-go/noninternal/flowcontrol"
+	"github.com/zirngibl/quic-go/noninternal/mocks"
+	"github.com/zirngibl/quic-go/noninternal/protocol"
+	"github.com/zirngibl/quic-go/noninternal/qerr"
+	"github.com/zirngibl/quic-go/noninternal/wire"
 
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"

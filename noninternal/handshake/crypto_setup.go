@@ -10,13 +10,13 @@ import (
 	"sync"
 	"time"
 
-	"gitlab.lrz.de/netintum/projects/gino/students/quic-go/noninternal/protocol"
-	"gitlab.lrz.de/netintum/projects/gino/students/quic-go/noninternal/qerr"
-	"gitlab.lrz.de/netintum/projects/gino/students/quic-go/noninternal/qtls"
-	"gitlab.lrz.de/netintum/projects/gino/students/quic-go/noninternal/utils"
-	"gitlab.lrz.de/netintum/projects/gino/students/quic-go/noninternal/wire"
-	"gitlab.lrz.de/netintum/projects/gino/students/quic-go/logging"
-	"gitlab.lrz.de/netintum/projects/gino/students/quic-go/quicvarint"
+	"github.com/zirngibl/quic-go/noninternal/protocol"
+	"github.com/zirngibl/quic-go/noninternal/qerr"
+	"github.com/zirngibl/quic-go/noninternal/qtls"
+	"github.com/zirngibl/quic-go/noninternal/utils"
+	"github.com/zirngibl/quic-go/noninternal/wire"
+	"github.com/zirngibl/quic-go/logging"
+	"github.com/zirngibl/quic-go/quicvarint"
 )
 
 // TLS unexpected_message alert
