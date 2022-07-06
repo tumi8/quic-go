@@ -4,8 +4,8 @@ import (
 	"math"
 	"time"
 
-	"gitlab.lrz.de/netintum/projects/gino/students/quic-go/noninternal/protocol"
-	"gitlab.lrz.de/netintum/projects/gino/students/quic-go/noninternal/utils"
+	"github.com/tumi8/quic-go/noninternal/protocol"
+	"github.com/tumi8/quic-go/noninternal/utils"
 )
 
 // This cubic implementation is based on the one found in Chromiums's QUIC

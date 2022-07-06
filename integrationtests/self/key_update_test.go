@@ -3,13 +3,13 @@ package self_test
 import (
 	"context"
 	"fmt"
-	"io/ioutil"
+	"io"
 	"net"
 
-	quic "gitlab.lrz.de/netintum/projects/gino/students/quic-go"
-	"gitlab.lrz.de/netintum/projects/gino/students/quic-go/noninternal/handshake"
-	"gitlab.lrz.de/netintum/projects/gino/students/quic-go/noninternal/protocol"
-	"gitlab.lrz.de/netintum/projects/gino/students/quic-go/logging"
+	quic "github.com/tumi8/quic-go"
+	"github.com/tumi8/quic-go/noninternal/handshake"
+	"github.com/tumi8/quic-go/noninternal/protocol"
+	"github.com/tumi8/quic-go/logging"
 
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
@@ -66,9 +66,9 @@ var _ = Describe("Key Update tests", func() {
 
 		go func() {
 			defer GinkgoRecover()
-			sess, err := server.Accept(context.Background())
+			conn, err := server.Accept(context.Background())
 			Expect(err).ToNot(HaveOccurred())
-			str, err := sess.OpenUniStream()
+			str, err := conn.OpenUniStream()
 			Expect(err).ToNot(HaveOccurred())
 			defer str.Close()
 			_, err = str.Write(PRDataLong)
@@ -82,18 +82,18 @@ var _ = Describe("Key Update tests", func() {
 		handshake.KeyUpdateInterval = 1 // update keys as frequently as possible
 
 		runServer()
-		sess, err := quic.DialAddr(
+		conn, err := quic.DialAddr(
 			fmt.Sprintf("localhost:%d", server.Addr().(*net.UDPAddr).Port),
 			getTLSClientConfig(),
 			getQuicConfig(&quic.Config{Tracer: newTracer(func() logging.ConnectionTracer { return &keyUpdateConnTracer{} })}),
 		)
 		Expect(err).ToNot(HaveOccurred())
-		str, err := sess.AcceptUniStream(context.Background())
+		str, err := conn.AcceptUniStream(context.Background())
 		Expect(err).ToNot(HaveOccurred())
-		data, err := ioutil.ReadAll(str)
+		data, err := io.ReadAll(str)
 		Expect(err).ToNot(HaveOccurred())
 		Expect(data).To(Equal(PRDataLong))
-		Expect(sess.CloseWithError(0, "")).To(Succeed())
+		Expect(conn.CloseWithError(0, "")).To(Succeed())
 
 		keyPhasesSent, keyPhasesReceived := countKeyPhases()
 		fmt.Fprintf(GinkgoWriter, "Used %d key phases on outgoing and %d key phases on incoming packets.\n", keyPhasesSent, keyPhasesReceived)

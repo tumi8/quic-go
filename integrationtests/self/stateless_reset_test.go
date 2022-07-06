@@ -2,15 +2,16 @@ package self_test
 
 import (
 	"context"
+	"errors"
 	"fmt"
 	"math/rand"
 	"net"
 	"time"
 
 
-	quic "gitlab.lrz.de/netintum/projects/gino/students/quic-go"
-	quicproxy "gitlab.lrz.de/netintum/projects/gino/students/quic-go/integrationtests/tools/proxy"
-	"gitlab.lrz.de/netintum/projects/gino/students/quic-go/noninternal/utils"
+	quic "github.com/tumi8/quic-go"
+	quicproxy "github.com/tumi8/quic-go/integrationtests/tools/proxy"
+	"github.com/tumi8/quic-go/noninternal/utils"
 
 
 	. "github.com/onsi/ginkgo"
@@ -36,9 +37,9 @@ var _ = Describe("Stateless Resets", func() {
 
 			go func() {
 				defer GinkgoRecover()
-				sess, err := ln.Accept(context.Background())
+				conn, err := ln.Accept(context.Background())
 				Expect(err).ToNot(HaveOccurred())
-				str, err := sess.OpenStream()
+				str, err := conn.OpenStream()
 				Expect(err).ToNot(HaveOccurred())
 				_, err = str.Write([]byte("foobar"))
 				Expect(err).ToNot(HaveOccurred())
@@ -57,7 +58,7 @@ var _ = Describe("Stateless Resets", func() {
 			Expect(err).ToNot(HaveOccurred())
 			defer proxy.Close()
 
-			sess, err := quic.DialAddr(
+			conn, err := quic.DialAddr(
 				fmt.Sprintf("localhost:%d", proxy.LocalPort()),
 				getTLSClientConfig(),
 				getQuicConfig(&quic.Config{
@@ -66,7 +67,7 @@ var _ = Describe("Stateless Resets", func() {
 				}),
 			)
 			Expect(err).ToNot(HaveOccurred())
-			str, err := sess.AcceptStream(context.Background())
+			str, err := conn.AcceptStream(context.Background())
 			Expect(err).ToNot(HaveOccurred())
 			data := make([]byte, 6)
 			_, err = str.Read(data)
@@ -101,7 +102,8 @@ var _ = Describe("Stateless Resets", func() {
 				_, serr = str.Read([]byte{0})
 			}
 			Expect(serr).To(HaveOccurred())
-			Expect(serr).To(MatchError(&quic.StatelessResetError{}))
+			statelessResetErr := &quic.StatelessResetError{}
+			Expect(errors.As(serr, &statelessResetErr)).To(BeTrue())
 			Expect(ln2.Close()).To(Succeed())
 			Eventually(acceptStopped).Should(BeClosed())
 		})

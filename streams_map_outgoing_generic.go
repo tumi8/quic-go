@@ -4,8 +4,8 @@ import (
 	"context"
 	"sync"
 
-	"gitlab.lrz.de/netintum/projects/gino/students/quic-go/noninternal/protocol"
-	"gitlab.lrz.de/netintum/projects/gino/students/quic-go/noninternal/wire"
+	"github.com/tumi8/quic-go/noninternal/protocol"
+	"github.com/tumi8/quic-go/noninternal/wire"
 )
 
 //go:generate genny -in $GOFILE -out streams_map_outgoing_bidi.go gen "item=streamI Item=BidiStream streamTypeGeneric=protocol.StreamTypeBidi"

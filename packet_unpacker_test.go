@@ -5,11 +5,11 @@ import (
 	"errors"
 	"time"
 
-	"gitlab.lrz.de/netintum/projects/gino/students/quic-go/noninternal/handshake"
-	"gitlab.lrz.de/netintum/projects/gino/students/quic-go/noninternal/mocks"
-	"gitlab.lrz.de/netintum/projects/gino/students/quic-go/noninternal/protocol"
-	"gitlab.lrz.de/netintum/projects/gino/students/quic-go/noninternal/qerr"
-	"gitlab.lrz.de/netintum/projects/gino/students/quic-go/noninternal/wire"
+	"github.com/tumi8/quic-go/noninternal/handshake"
+	"github.com/tumi8/quic-go/noninternal/mocks"
+	"github.com/tumi8/quic-go/noninternal/protocol"
+	"github.com/tumi8/quic-go/noninternal/qerr"
+	"github.com/tumi8/quic-go/noninternal/wire"
 
 	"github.com/golang/mock/gomock"
 
@@ -60,7 +60,7 @@ var _ = Describe("Packet Unpacker", func() {
 		opener := mocks.NewMockLongHeaderOpener(mockCtrl)
 		cs.EXPECT().GetHandshakeOpener().Return(opener, nil)
 		_, err := unpacker.Unpack(hdr, time.Now(), data)
-		Expect(errors.Is(err, &headerParseError{})).To(BeTrue())
+		Expect(err).To(BeAssignableToTypeOf(&headerParseError{}))
 		var headerErr *headerParseError
 		Expect(errors.As(err, &headerErr)).To(BeTrue())
 		Expect(err).To(MatchError("Packet too small. Expected at least 20 bytes after the header, got 19"))
@@ -77,9 +77,7 @@ var _ = Describe("Packet Unpacker", func() {
 		opener := mocks.NewMockShortHeaderOpener(mockCtrl)
 		cs.EXPECT().Get1RTTOpener().Return(opener, nil)
 		_, err := unpacker.Unpack(hdr, time.Now(), data)
-		Expect(errors.Is(err, &headerParseError{})).To(BeTrue())
-		var headerErr *headerParseError
-		Expect(errors.As(err, &headerErr)).To(BeTrue())
+		Expect(err).To(BeAssignableToTypeOf(&headerParseError{}))
 		Expect(err).To(MatchError("Packet too small. Expected at least 20 bytes after the header, got 19"))
 	})
 

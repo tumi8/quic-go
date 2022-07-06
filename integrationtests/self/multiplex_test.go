@@ -3,13 +3,13 @@ package self_test
 import (
 	"context"
 	"fmt"
-	"io/ioutil"
+	"io"
 	"net"
 	"runtime"
 	"time"
 
-	quic "gitlab.lrz.de/netintum/projects/gino/students/quic-go"
-	"gitlab.lrz.de/netintum/projects/gino/students/quic-go/noninternal/protocol"
+	quic "github.com/tumi8/quic-go"
+	"github.com/tumi8/quic-go/noninternal/protocol"
 
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
@@ -24,13 +24,13 @@ var _ = Describe("Multiplexing", func() {
 				go func() {
 					defer GinkgoRecover()
 					for {
-						sess, err := ln.Accept(context.Background())
+						conn, err := ln.Accept(context.Background())
 						if err != nil {
 							return
 						}
 						go func() {
 							defer GinkgoRecover()
-							str, err := sess.OpenStream()
+							str, err := conn.OpenStream()
 							Expect(err).ToNot(HaveOccurred())
 							defer str.Close()
 							_, err = str.Write(PRData)
@@ -40,19 +40,19 @@ var _ = Describe("Multiplexing", func() {
 				}()
 			}
 
-			dial := func(conn net.PacketConn, addr net.Addr) {
-				sess, err := quic.Dial(
-					conn,
+			dial := func(pconn net.PacketConn, addr net.Addr) {
+				conn, err := quic.Dial(
+					pconn,
 					addr,
 					fmt.Sprintf("localhost:%d", addr.(*net.UDPAddr).Port),
 					getTLSClientConfig(),
 					getQuicConfig(&quic.Config{Versions: []protocol.VersionNumber{version}}),
 				)
 				Expect(err).ToNot(HaveOccurred())
-				defer sess.CloseWithError(0, "")
-				str, err := sess.AcceptStream(context.Background())
+				defer conn.CloseWithError(0, "")
+				str, err := conn.AcceptStream(context.Background())
 				Expect(err).ToNot(HaveOccurred())
-				data, err := ioutil.ReadAll(str)
+				data, err := io.ReadAll(str)
 				Expect(err).ToNot(HaveOccurred())
 				Expect(data).To(Equal(PRData))
 			}

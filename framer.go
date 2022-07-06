@@ -4,10 +4,10 @@ import (
 	"errors"
 	"sync"
 
-	"gitlab.lrz.de/netintum/projects/gino/students/quic-go/noninternal/ackhandler"
-	"gitlab.lrz.de/netintum/projects/gino/students/quic-go/noninternal/protocol"
-	"gitlab.lrz.de/netintum/projects/gino/students/quic-go/noninternal/wire"
-	"gitlab.lrz.de/netintum/projects/gino/students/quic-go/quicvarint"
+	"github.com/tumi8/quic-go/noninternal/ackhandler"
+	"github.com/tumi8/quic-go/noninternal/protocol"
+	"github.com/tumi8/quic-go/noninternal/wire"
+	"github.com/tumi8/quic-go/quicvarint"
 )
 
 type framer interface {

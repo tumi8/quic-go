@@ -3,13 +3,13 @@ package self_test
 import (
 	"context"
 	"fmt"
-	"io/ioutil"
+	"io"
 	"net"
 	"time"
 
-	quic "gitlab.lrz.de/netintum/projects/gino/students/quic-go"
-	quicproxy "gitlab.lrz.de/netintum/projects/gino/students/quic-go/integrationtests/tools/proxy"
-	"gitlab.lrz.de/netintum/projects/gino/students/quic-go/noninternal/protocol"
+	quic "github.com/tumi8/quic-go"
+	quicproxy "github.com/tumi8/quic-go/integrationtests/tools/proxy"
+	"github.com/tumi8/quic-go/noninternal/protocol"
 
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
@@ -28,9 +28,9 @@ var _ = Describe("non-zero RTT", func() {
 			Expect(err).ToNot(HaveOccurred())
 			go func() {
 				defer GinkgoRecover()
-				sess, err := ln.Accept(context.Background())
+				conn, err := ln.Accept(context.Background())
 				Expect(err).ToNot(HaveOccurred())
-				str, err := sess.OpenStream()
+				str, err := conn.OpenStream()
 				Expect(err).ToNot(HaveOccurred())
 				_, err = str.Write(PRData)
 				Expect(err).ToNot(HaveOccurred())
@@ -40,18 +40,18 @@ var _ = Describe("non-zero RTT", func() {
 		}
 
 		downloadFile := func(port int) {
-			sess, err := quic.DialAddr(
+			conn, err := quic.DialAddr(
 				fmt.Sprintf("localhost:%d", port),
 				getTLSClientConfig(),
 				getQuicConfig(&quic.Config{Versions: []protocol.VersionNumber{version}}),
 			)
 			Expect(err).ToNot(HaveOccurred())
-			str, err := sess.AcceptStream(context.Background())
+			str, err := conn.AcceptStream(context.Background())
 			Expect(err).ToNot(HaveOccurred())
-			data, err := ioutil.ReadAll(str)
+			data, err := io.ReadAll(str)
 			Expect(err).ToNot(HaveOccurred())
 			Expect(data).To(Equal(PRData))
-			sess.CloseWithError(0, "")
+			conn.CloseWithError(0, "")
 		}
 
 		Context(fmt.Sprintf("with QUIC version %s", version), func() {
@@ -76,18 +76,18 @@ var _ = Describe("non-zero RTT", func() {
 					Expect(err).ToNot(HaveOccurred())
 					defer proxy.Close()
 
-					sess, err := quic.DialAddr(
+					conn, err := quic.DialAddr(
 						fmt.Sprintf("localhost:%d", proxy.LocalPort()),
 						getTLSClientConfig(),
 						getQuicConfig(&quic.Config{Versions: []protocol.VersionNumber{version}}),
 					)
 					Expect(err).ToNot(HaveOccurred())
-					str, err := sess.AcceptStream(context.Background())
+					str, err := conn.AcceptStream(context.Background())
 					Expect(err).ToNot(HaveOccurred())
-					data, err := ioutil.ReadAll(str)
+					data, err := io.ReadAll(str)
 					Expect(err).ToNot(HaveOccurred())
 					Expect(data).To(Equal(PRData))
-					sess.CloseWithError(0, "")
+					conn.CloseWithError(0, "")
 				})
 			}
 

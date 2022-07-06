@@ -5,11 +5,11 @@ import (
 	"time"
 
 	"github.com/golang/mock/gomock"
-	"gitlab.lrz.de/netintum/projects/gino/students/quic-go/noninternal/mocks"
-	"gitlab.lrz.de/netintum/projects/gino/students/quic-go/noninternal/protocol"
-	"gitlab.lrz.de/netintum/projects/gino/students/quic-go/noninternal/qerr"
-	"gitlab.lrz.de/netintum/projects/gino/students/quic-go/noninternal/utils"
-	"gitlab.lrz.de/netintum/projects/gino/students/quic-go/noninternal/wire"
+	"github.com/tumi8/quic-go/noninternal/mocks"
+	"github.com/tumi8/quic-go/noninternal/protocol"
+	"github.com/tumi8/quic-go/noninternal/qerr"
+	"github.com/tumi8/quic-go/noninternal/utils"
+	"github.com/tumi8/quic-go/noninternal/wire"
 
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
@@ -929,6 +929,17 @@ var _ = Describe("SentPacketHandler", func() {
 			Expect(handler.GetLossDetectionTimeout()).To(BeZero())
 			handler.ReceivedPacket(protocol.EncryptionHandshake)
 			Expect(handler.GetLossDetectionTimeout()).ToNot(BeZero())
+		})
+
+		It("cancels the loss detection alarm when all Handshake packets are acknowledged", func() {
+			t := time.Now().Add(-time.Second)
+			handler.ReceivedBytes(99999)
+			handler.SentPacket(ackElicitingPacket(&Packet{PacketNumber: 2, SendTime: t}))
+			handler.SentPacket(handshakePacket(&Packet{PacketNumber: 3, SendTime: t}))
+			handler.SentPacket(handshakePacket(&Packet{PacketNumber: 4, SendTime: t}))
+			Expect(handler.GetLossDetectionTimeout()).ToNot(BeZero())
+			handler.ReceivedAck(&wire.AckFrame{AckRanges: []wire.AckRange{{Smallest: 3, Largest: 4}}}, protocol.EncryptionHandshake, time.Now())
+			Expect(handler.GetLossDetectionTimeout()).To(BeZero())
 		})
 	})
 

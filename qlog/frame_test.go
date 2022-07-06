@@ -5,9 +5,9 @@ import (
 	"encoding/json"
 	"time"
 
-	"gitlab.lrz.de/netintum/projects/gino/students/quic-go/noninternal/protocol"
-	"gitlab.lrz.de/netintum/projects/gino/students/quic-go/noninternal/qerr"
-	"gitlab.lrz.de/netintum/projects/gino/students/quic-go/logging"
+	"github.com/tumi8/quic-go/noninternal/protocol"
+	"github.com/tumi8/quic-go/noninternal/qerr"
+	"github.com/tumi8/quic-go/logging"
 
 	"github.com/francoispqt/gojay"
 

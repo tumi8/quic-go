@@ -9,8 +9,8 @@ import (
 	time "time"
 
 	gomock "github.com/golang/mock/gomock"
-	ackhandler "gitlab.lrz.de/netintum/projects/gino/students/quic-go/noninternal/ackhandler"
-	protocol "gitlab.lrz.de/netintum/projects/gino/students/quic-go/noninternal/protocol"
+	ackhandler "github.com/tumi8/quic-go/noninternal/ackhandler"
+	protocol "github.com/tumi8/quic-go/noninternal/protocol"
 )
 
 // MockMtuDiscoverer is a mock of MtuDiscoverer interface.
@@ -49,20 +49,6 @@ func (m *MockMtuDiscoverer) GetPing() (ackhandler.Frame, protocol.ByteCount) {
 func (mr *MockMtuDiscovererMockRecorder) GetPing() *gomock.Call {
 	mr.mock.ctrl.T.Helper()
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetPing", reflect.TypeOf((*MockMtuDiscoverer)(nil).GetPing))
-}
-
-// NextProbeTime mocks base method.
-func (m *MockMtuDiscoverer) NextProbeTime() time.Time {
-	m.ctrl.T.Helper()
-	ret := m.ctrl.Call(m, "NextProbeTime")
-	ret0, _ := ret[0].(time.Time)
-	return ret0
-}
-
-// NextProbeTime indicates an expected call of NextProbeTime.
-func (mr *MockMtuDiscovererMockRecorder) NextProbeTime() *gomock.Call {
-	mr.mock.ctrl.T.Helper()
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "NextProbeTime", reflect.TypeOf((*MockMtuDiscoverer)(nil).NextProbeTime))
 }
 
 // ShouldSendProbe mocks base method.

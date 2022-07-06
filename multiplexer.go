@@ -6,8 +6,8 @@ import (
 	"net"
 	"sync"
 
-	"gitlab.lrz.de/netintum/projects/gino/students/quic-go/noninternal/utils"
-	"gitlab.lrz.de/netintum/projects/gino/students/quic-go/logging"
+	"github.com/tumi8/quic-go/noninternal/utils"
+	"github.com/tumi8/quic-go/logging"
 )
 
 var (
@@ -32,7 +32,7 @@ type connManager struct {
 }
 
 // The connMultiplexer listens on multiple net.PacketConns and dispatches
-// incoming packets to the session handler.
+// incoming packets to the connection handler.
 type connMultiplexer struct {
 	mutex sync.Mutex
 

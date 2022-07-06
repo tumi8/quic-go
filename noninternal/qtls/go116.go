@@ -1,5 +1,5 @@
-// +build go1.16
-// +build !go1.17
+//go:build go1.16 && !go1.17
+// +build go1.16,!go1.17
 
 package qtls
 
@@ -10,7 +10,7 @@ import (
 	"net"
 	"unsafe"
 
-	qtls "gitlab.lrz.de/netintum/projects/gino/students/quic-tls"
+	qtls "github.com/tumi8/quic-tls"
 )
 
 type (

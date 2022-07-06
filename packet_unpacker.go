@@ -5,9 +5,9 @@ import (
 	"fmt"
 	"time"
 
-	"gitlab.lrz.de/netintum/projects/gino/students/quic-go/noninternal/handshake"
-	"gitlab.lrz.de/netintum/projects/gino/students/quic-go/noninternal/protocol"
-	"gitlab.lrz.de/netintum/projects/gino/students/quic-go/noninternal/wire"
+	"github.com/tumi8/quic-go/noninternal/handshake"
+	"github.com/tumi8/quic-go/noninternal/protocol"
+	"github.com/tumi8/quic-go/noninternal/wire"
 )
 
 type headerDecryptor interface {
@@ -16,11 +16,6 @@ type headerDecryptor interface {
 
 type headerParseError struct {
 	err error
-}
-
-func (e *headerParseError) Is(err error) bool {
-	_, ok := err.(*headerParseError)
-	return ok
 }
 
 func (e *headerParseError) Unwrap() error {

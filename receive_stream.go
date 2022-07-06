@@ -6,11 +6,11 @@ import (
 	"sync"
 	"time"
 
-	"gitlab.lrz.de/netintum/projects/gino/students/quic-go/noninternal/flowcontrol"
-	"gitlab.lrz.de/netintum/projects/gino/students/quic-go/noninternal/protocol"
-	"gitlab.lrz.de/netintum/projects/gino/students/quic-go/noninternal/qerr"
-	"gitlab.lrz.de/netintum/projects/gino/students/quic-go/noninternal/utils"
-	"gitlab.lrz.de/netintum/projects/gino/students/quic-go/noninternal/wire"
+	"github.com/tumi8/quic-go/noninternal/flowcontrol"
+	"github.com/tumi8/quic-go/noninternal/protocol"
+	"github.com/tumi8/quic-go/noninternal/qerr"
+	"github.com/tumi8/quic-go/noninternal/utils"
+	"github.com/tumi8/quic-go/noninternal/wire"
 )
 
 type receiveStreamI interface {
@@ -166,13 +166,10 @@ func (s *receiveStream) readImpl(p []byte) (bool /*stream completed */, int, err
 			return false, bytesRead, fmt.Errorf("BUG: readPosInFrame (%d) > frame.DataLen (%d) in stream.Read", s.readPosInFrame, len(s.currentFrame))
 		}
 
-		s.mutex.Unlock()
-
 		m := copy(p[bytesRead:], s.currentFrame[s.readPosInFrame:])
 		s.readPosInFrame += m
 		bytesRead += m
 
-		s.mutex.Lock()
 		// when a RESET_STREAM was received, the was already informed about the final byteOffset for this stream
 		if !s.resetRemotely {
 			s.flowController.AddBytesRead(protocol.ByteCount(m))

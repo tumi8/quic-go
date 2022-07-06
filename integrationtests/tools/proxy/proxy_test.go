@@ -10,8 +10,8 @@ import (
 	"sync/atomic"
 	"time"
 
-	"gitlab.lrz.de/netintum/projects/gino/students/quic-go/noninternal/protocol"
-	"gitlab.lrz.de/netintum/projects/gino/students/quic-go/noninternal/wire"
+	"github.com/tumi8/quic-go/noninternal/protocol"
+	"github.com/tumi8/quic-go/noninternal/wire"
 
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
@@ -84,7 +84,7 @@ var _ = Describe("QUIC Proxy", func() {
 			proxy, err := NewQuicProxy("localhost:0", nil)
 			Expect(err).ToNot(HaveOccurred())
 			port := proxy.LocalPort()
-			Expect(isProxyRunning()).To(BeTrue())
+			Eventually(isProxyRunning).Should(BeTrue())
 			err = proxy.Close()
 			Expect(err).ToNot(HaveOccurred())
 

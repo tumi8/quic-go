@@ -3,15 +3,14 @@ package quic
 import (
 	"time"
 
-	"gitlab.lrz.de/netintum/projects/gino/students/quic-go/noninternal/ackhandler"
-	"gitlab.lrz.de/netintum/projects/gino/students/quic-go/noninternal/protocol"
-	"gitlab.lrz.de/netintum/projects/gino/students/quic-go/noninternal/utils"
-	"gitlab.lrz.de/netintum/projects/gino/students/quic-go/noninternal/wire"
+	"github.com/tumi8/quic-go/noninternal/ackhandler"
+	"github.com/tumi8/quic-go/noninternal/protocol"
+	"github.com/tumi8/quic-go/noninternal/utils"
+	"github.com/tumi8/quic-go/noninternal/wire"
 )
 
 type mtuDiscoverer interface {
 	ShouldSendProbe(now time.Time) bool
-	NextProbeTime() time.Time
 	GetPing() (ping ackhandler.Frame, datagramSize protocol.ByteCount)
 }
 
@@ -53,16 +52,7 @@ func (f *mtuFinder) ShouldSendProbe(now time.Time) bool {
 	if f.probeInFlight || f.done() {
 		return false
 	}
-	return !now.Before(f.NextProbeTime())
-}
-
-// NextProbeTime returns the time when the next probe packet should be sent.
-// It returns the zero value if no probe packet should be sent.
-func (f *mtuFinder) NextProbeTime() time.Time {
-	if f.probeInFlight || f.done() {
-		return time.Time{}
-	}
-	return f.lastProbeTime.Add(mtuProbeDelay * f.rttStats.SmoothedRTT())
+	return !now.Before(f.lastProbeTime.Add(mtuProbeDelay * f.rttStats.SmoothedRTT()))
 }
 
 func (f *mtuFinder) GetPing() (ackhandler.Frame, protocol.ByteCount) {

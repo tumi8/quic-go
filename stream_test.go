@@ -7,9 +7,9 @@ import (
 	"strconv"
 	"time"
 
-	"gitlab.lrz.de/netintum/projects/gino/students/quic-go/noninternal/mocks"
-	"gitlab.lrz.de/netintum/projects/gino/students/quic-go/noninternal/protocol"
-	"gitlab.lrz.de/netintum/projects/gino/students/quic-go/noninternal/wire"
+	"github.com/tumi8/quic-go/noninternal/mocks"
+	"github.com/tumi8/quic-go/noninternal/protocol"
+	"github.com/tumi8/quic-go/noninternal/wire"
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
 	"github.com/onsi/gomega/gbytes"
@@ -99,7 +99,6 @@ var _ = Describe("Stream", func() {
 var _ = Describe("Deadline Error", func() {
 	It("is a net.Error that wraps os.ErrDeadlineError", func() {
 		err := deadlineError{}
-		Expect(err.Temporary()).To(BeTrue())
 		Expect(err.Timeout()).To(BeTrue())
 		Expect(errors.Is(err, os.ErrDeadlineExceeded)).To(BeTrue())
 		Expect(errors.Unwrap(err)).To(Equal(os.ErrDeadlineExceeded))

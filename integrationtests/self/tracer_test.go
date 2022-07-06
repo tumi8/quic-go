@@ -11,11 +11,11 @@ import (
 	"net"
 	"time"
 
-	"gitlab.lrz.de/netintum/projects/gino/students/quic-go"
-	"gitlab.lrz.de/netintum/projects/gino/students/quic-go/noninternal/protocol"
-	"gitlab.lrz.de/netintum/projects/gino/students/quic-go/noninternal/utils"
-	"gitlab.lrz.de/netintum/projects/gino/students/quic-go/logging"
-	"gitlab.lrz.de/netintum/projects/gino/students/quic-go/qlog"
+	"github.com/tumi8/quic-go"
+	"github.com/tumi8/quic-go/noninternal/protocol"
+	"github.com/tumi8/quic-go/noninternal/utils"
+	"github.com/tumi8/quic-go/logging"
+	"github.com/tumi8/quic-go/qlog"
 
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
@@ -115,9 +115,9 @@ var _ = Describe("Handshake tests", func() {
 				ln, err := quic.ListenAddr("localhost:0", getTLSConfig(), quicServerConf)
 				Expect(err).ToNot(HaveOccurred())
 				serverChan <- ln
-				sess, err := ln.Accept(context.Background())
+				conn, err := ln.Accept(context.Background())
 				Expect(err).ToNot(HaveOccurred())
-				str, err := sess.OpenUniStream()
+				str, err := conn.OpenUniStream()
 				Expect(err).ToNot(HaveOccurred())
 				_, err = str.Write(PRData)
 				Expect(err).ToNot(HaveOccurred())
@@ -127,16 +127,16 @@ var _ = Describe("Handshake tests", func() {
 			ln := <-serverChan
 			defer ln.Close()
 
-			sess, err := quic.DialAddr(
+			conn, err := quic.DialAddr(
 				fmt.Sprintf("localhost:%d", ln.Addr().(*net.UDPAddr).Port),
 				getTLSClientConfig(),
 				quicClientConf,
 			)
 			Expect(err).ToNot(HaveOccurred())
-			defer sess.CloseWithError(0, "")
-			str, err := sess.AcceptUniStream(context.Background())
+			defer conn.CloseWithError(0, "")
+			str, err := conn.AcceptUniStream(context.Background())
 			Expect(err).ToNot(HaveOccurred())
-			data, err := ioutil.ReadAll(str)
+			data, err := io.ReadAll(str)
 			Expect(err).ToNot(HaveOccurred())
 			Expect(data).To(Equal(PRData))
 		})
