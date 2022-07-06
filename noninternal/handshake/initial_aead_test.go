@@ -4,7 +4,7 @@ import (
 	"fmt"
 	"math/rand"
 
-	"gitlab.lrz.de/netintum/projects/gino/students/quic-go/noninternal/protocol"
+	"github.com/tumi8/quic-go/noninternal/protocol"
 
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
@@ -72,8 +72,8 @@ var _ = Describe("Initial AEAD using AES-GCM", func() {
 	})
 
 	// values taken from the Appendix of the draft
-	Context("using the test vector from the QUIC draft, for QUIC draft-34", func() {
-		const version = protocol.VersionDraft34
+	Context("using the test vector from the QUIC draft, for QUIC v1", func() {
+		const version = protocol.Version1
 		var connID protocol.ConnectionID
 
 		BeforeEach(func() {
@@ -125,7 +125,7 @@ var _ = Describe("Initial AEAD using AES-GCM", func() {
 		})
 	})
 
-	for _, ver := range []protocol.VersionNumber{protocol.VersionDraft32, protocol.VersionDraft34} {
+	for _, ver := range []protocol.VersionNumber{protocol.VersionDraft29, protocol.Version1} {
 		v := ver
 
 		Context(fmt.Sprintf("using version %s", v), func() {

@@ -4,9 +4,9 @@ import (
 	"errors"
 	"time"
 
-	"gitlab.lrz.de/netintum/projects/gino/students/quic-go/noninternal/utils"
+	"github.com/tumi8/quic-go/noninternal/utils"
 
-	"gitlab.lrz.de/netintum/projects/gino/students/quic-go/noninternal/protocol"
+	"github.com/tumi8/quic-go/noninternal/protocol"
 )
 
 // Clone clones a Config
@@ -100,27 +100,27 @@ func populateConfig(config *Config) *Config {
 		maxIncomingUniStreams = 0
 	}
 
-	# TODO add scid/dcid
-
 	return &Config{
-		Versions:                       versions,
-		HandshakeIdleTimeout:           handshakeIdleTimeout,
-		MaxIdleTimeout:                 idleTimeout,
-		AcceptToken:                    config.AcceptToken,
-		KeepAlive:                      config.KeepAlive,
-		InitialStreamReceiveWindow:     initialStreamReceiveWindow,
-		MaxStreamReceiveWindow:         maxStreamReceiveWindow,
-		InitialConnectionReceiveWindow: initialConnectionReceiveWindow,
-		MaxConnectionReceiveWindow:     maxConnectionReceiveWindow,
-		MaxIncomingStreams:             maxIncomingStreams,
-		MaxIncomingUniStreams:          maxIncomingUniStreams,
-		ConnectionIDLength:             config.ConnectionIDLength,
-		StatelessResetKey:              config.StatelessResetKey,
-		TokenStore:                     config.TokenStore,
-		EnableDatagrams:                config.EnableDatagrams,
-		DisablePathMTUDiscovery:        config.DisablePathMTUDiscovery,
-		Tracer:                         config.Tracer,
-		SCID:							config.SCID,
-		DCID:							config.DCID,
+		Versions:                         versions,
+		HandshakeIdleTimeout:             handshakeIdleTimeout,
+		MaxIdleTimeout:                   idleTimeout,
+		AcceptToken:                      config.AcceptToken,
+		KeepAlive:                        config.KeepAlive,
+		InitialStreamReceiveWindow:       initialStreamReceiveWindow,
+		MaxStreamReceiveWindow:           maxStreamReceiveWindow,
+		InitialConnectionReceiveWindow:   initialConnectionReceiveWindow,
+		MaxConnectionReceiveWindow:       maxConnectionReceiveWindow,
+		AllowConnectionWindowIncrease:    config.AllowConnectionWindowIncrease,
+		MaxIncomingStreams:               maxIncomingStreams,
+		MaxIncomingUniStreams:            maxIncomingUniStreams,
+		ConnectionIDLength:               config.ConnectionIDLength,
+		StatelessResetKey:                config.StatelessResetKey,
+		TokenStore:                       config.TokenStore,
+		EnableDatagrams:                  config.EnableDatagrams,
+		DisablePathMTUDiscovery:          config.DisablePathMTUDiscovery,
+		DisableVersionNegotiationPackets: config.DisableVersionNegotiationPackets,
+		Tracer:                           config.Tracer,
+		SCID:                             config.SCID,
+		DCID:                             config.DCID,
 	}
 }

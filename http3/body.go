@@ -4,7 +4,7 @@ import (
 	"fmt"
 	"io"
 
-	"gitlab.lrz.de/netintum/projects/gino/students/quic-go"
+	"github.com/tumi8/quic-go"
 )
 
 // The body of a http.Request or http.Response.

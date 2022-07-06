@@ -13,7 +13,7 @@ import (
 	"strings"
 	"sync"
 
-	"gitlab.lrz.de/netintum/projects/gino/students/quic-go"
+	"github.com/tumi8/quic-go"
 )
 
 const h09alpn = "hq-interop"
@@ -78,17 +78,17 @@ func (s *Server) ListenAndServe() error {
 	s.mutex.Unlock()
 
 	for {
-		sess, err := ln.Accept(context.Background())
+		conn, err := ln.Accept(context.Background())
 		if err != nil {
 			return err
 		}
-		go s.handleConn(sess)
+		go s.handleConn(conn)
 	}
 }
 
-func (s *Server) handleConn(sess quic.Session) {
+func (s *Server) handleConn(conn quic.Connection) {
 	for {
-		str, err := sess.AcceptStream(context.Background())
+		str, err := conn.AcceptStream(context.Background())
 		if err != nil {
 			log.Printf("Error accepting stream: %s\n", err.Error())
 			return

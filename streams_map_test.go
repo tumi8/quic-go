@@ -7,11 +7,11 @@ import (
 	"net"
 
 	"github.com/golang/mock/gomock"
-	"gitlab.lrz.de/netintum/projects/gino/students/quic-go/noninternal/flowcontrol"
-	"gitlab.lrz.de/netintum/projects/gino/students/quic-go/noninternal/mocks"
-	"gitlab.lrz.de/netintum/projects/gino/students/quic-go/noninternal/protocol"
-	"gitlab.lrz.de/netintum/projects/gino/students/quic-go/noninternal/qerr"
-	"gitlab.lrz.de/netintum/projects/gino/students/quic-go/noninternal/wire"
+	"github.com/tumi8/quic-go/noninternal/flowcontrol"
+	"github.com/tumi8/quic-go/noninternal/mocks"
+	"github.com/tumi8/quic-go/noninternal/protocol"
+	"github.com/tumi8/quic-go/noninternal/qerr"
+	"github.com/tumi8/quic-go/noninternal/wire"
 
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
@@ -37,7 +37,6 @@ func expectTooManyStreamsError(err error) {
 	ExpectWithOffset(1, err.Error()).To(Equal(errTooManyOpenStreams.Error()))
 	nerr, ok := err.(net.Error)
 	ExpectWithOffset(1, ok).To(BeTrue())
-	ExpectWithOffset(1, nerr.Temporary()).To(BeTrue())
 	ExpectWithOffset(1, nerr.Timeout()).To(BeFalse())
 }
 

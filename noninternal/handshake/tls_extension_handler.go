@@ -1,8 +1,8 @@
 package handshake
 
 import (
-	"gitlab.lrz.de/netintum/projects/gino/students/quic-go/noninternal/protocol"
-	"gitlab.lrz.de/netintum/projects/gino/students/quic-go/noninternal/qtls"
+	"github.com/tumi8/quic-go/noninternal/protocol"
+	"github.com/tumi8/quic-go/noninternal/qtls"
 )
 
 const (
@@ -24,7 +24,7 @@ var _ tlsExtensionHandler = &extensionHandler{}
 // newExtensionHandler creates a new extension handler
 func newExtensionHandler(params []byte, pers protocol.Perspective, v protocol.VersionNumber) tlsExtensionHandler {
 	et := uint16(quicTLSExtensionType)
-	if v != protocol.VersionDraft34 && v != protocol.Version1 {
+	if v != protocol.Version1 {
 		et = quicTLSExtensionTypeOldDrafts
 	}
 	return &extensionHandler{

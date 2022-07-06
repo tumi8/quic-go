@@ -6,8 +6,8 @@ import (
 	"reflect"
 	"time"
 
-	mocklogging "gitlab.lrz.de/netintum/projects/gino/students/quic-go/noninternal/mocks/logging"
-	"gitlab.lrz.de/netintum/projects/gino/students/quic-go/noninternal/protocol"
+	mocklogging "github.com/tumi8/quic-go/noninternal/mocks/logging"
+	"github.com/tumi8/quic-go/noninternal/protocol"
 
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
@@ -45,7 +45,7 @@ var _ = Describe("Config", func() {
 			}
 
 			switch fn := typ.Field(i).Name; fn {
-			case "AcceptToken", "GetLogWriter":
+			case "AcceptToken", "GetLogWriter", "AllowConnectionWindowIncrease":
 				// Can't compare functions.
 			case "Versions":
 				f.Set(reflect.ValueOf([]VersionNumber{1, 2, 3}))
@@ -75,10 +75,14 @@ var _ = Describe("Config", func() {
 				f.Set(reflect.ValueOf(true))
 			case "EnableDatagrams":
 				f.Set(reflect.ValueOf(true))
+			case "DisableVersionNegotiationPackets":
+				f.Set(reflect.ValueOf(true))
 			case "DisablePathMTUDiscovery":
 				f.Set(reflect.ValueOf(true))
 			case "Tracer":
 				f.Set(reflect.ValueOf(mocklogging.NewMockTracer(mockCtrl)))
+			case "SCID":
+			case "DCID":
 			default:
 				Fail(fmt.Sprintf("all fields must be accounted for, but saw unknown field %q", fn))
 			}
@@ -98,13 +102,16 @@ var _ = Describe("Config", func() {
 
 	Context("cloning", func() {
 		It("clones function fields", func() {
-			var calledAcceptToken bool
+			var calledAcceptToken, calledAllowConnectionWindowIncrease bool
 			c1 := &Config{
-				AcceptToken: func(_ net.Addr, _ *Token) bool { calledAcceptToken = true; return true },
+				AcceptToken:                   func(_ net.Addr, _ *Token) bool { calledAcceptToken = true; return true },
+				AllowConnectionWindowIncrease: func(Connection, uint64) bool { calledAllowConnectionWindowIncrease = true; return true },
 			}
 			c2 := c1.Clone()
 			c2.AcceptToken(&net.UDPAddr{}, &Token{})
 			Expect(calledAcceptToken).To(BeTrue())
+			c2.AllowConnectionWindowIncrease(nil, 1234)
+			Expect(calledAllowConnectionWindowIncrease).To(BeTrue())
 		})
 
 		It("clones non-function fields", func() {
@@ -152,6 +159,7 @@ var _ = Describe("Config", func() {
 			Expect(c.MaxConnectionReceiveWindow).To(BeEquivalentTo(protocol.DefaultMaxReceiveConnectionFlowControlWindow))
 			Expect(c.MaxIncomingStreams).To(BeEquivalentTo(protocol.DefaultMaxIncomingStreams))
 			Expect(c.MaxIncomingUniStreams).To(BeEquivalentTo(protocol.DefaultMaxIncomingUniStreams))
+			Expect(c.DisableVersionNegotiationPackets).To(BeFalse())
 			Expect(c.DisablePathMTUDiscovery).To(BeFalse())
 		})
 

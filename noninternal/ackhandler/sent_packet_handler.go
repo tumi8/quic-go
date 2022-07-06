@@ -5,12 +5,12 @@ import (
 	"fmt"
 	"time"
 
-	"gitlab.lrz.de/netintum/projects/gino/students/quic-go/noninternal/congestion"
-	"gitlab.lrz.de/netintum/projects/gino/students/quic-go/noninternal/protocol"
-	"gitlab.lrz.de/netintum/projects/gino/students/quic-go/noninternal/qerr"
-	"gitlab.lrz.de/netintum/projects/gino/students/quic-go/noninternal/utils"
-	"gitlab.lrz.de/netintum/projects/gino/students/quic-go/noninternal/wire"
-	"gitlab.lrz.de/netintum/projects/gino/students/quic-go/logging"
+	"github.com/tumi8/quic-go/noninternal/congestion"
+	"github.com/tumi8/quic-go/noninternal/protocol"
+	"github.com/tumi8/quic-go/noninternal/qerr"
+	"github.com/tumi8/quic-go/noninternal/utils"
+	"github.com/tumi8/quic-go/noninternal/wire"
+	"github.com/tumi8/quic-go/logging"
 )
 
 const (
@@ -483,14 +483,13 @@ func (h *sentPacketHandler) getPTOTimeAndSpace() (pto time.Time, encLevel protoc
 }
 
 func (h *sentPacketHandler) hasOutstandingCryptoPackets() bool {
-	var hasInitial, hasHandshake bool
-	if h.initialPackets != nil {
-		hasInitial = h.initialPackets.history.HasOutstandingPackets()
+	if h.initialPackets != nil && h.initialPackets.history.HasOutstandingPackets() {
+		return true
 	}
-	if h.handshakePackets != nil {
-		hasHandshake = h.handshakePackets.history.HasOutstandingPackets()
+	if h.handshakePackets != nil && h.handshakePackets.history.HasOutstandingPackets() {
+		return true
 	}
-	return hasInitial || hasHandshake
+	return false
 }
 
 func (h *sentPacketHandler) hasOutstandingPackets() bool {
@@ -536,6 +535,13 @@ func (h *sentPacketHandler) setLossDetectionTimer() {
 	// PTO alarm
 	ptoTime, encLevel, ok := h.getPTOTimeAndSpace()
 	if !ok {
+		if !oldAlarm.IsZero() {
+			h.alarm = time.Time{}
+			h.logger.Debugf("Canceling loss detection timer. No PTO needed..")
+			if h.tracer != nil {
+				h.tracer.LossTimerCanceled()
+			}
+		}
 		return
 	}
 	h.alarm = ptoTime

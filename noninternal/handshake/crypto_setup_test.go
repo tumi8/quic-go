@@ -10,12 +10,12 @@ import (
 	"math/big"
 	"time"
 
-	mocktls "gitlab.lrz.de/netintum/projects/gino/students/quic-go/noninternal/mocks/tls"
-	"gitlab.lrz.de/netintum/projects/gino/students/quic-go/noninternal/protocol"
-	"gitlab.lrz.de/netintum/projects/gino/students/quic-go/noninternal/qerr"
-	"gitlab.lrz.de/netintum/projects/gino/students/quic-go/noninternal/testdata"
-	"gitlab.lrz.de/netintum/projects/gino/students/quic-go/noninternal/utils"
-	"gitlab.lrz.de/netintum/projects/gino/students/quic-go/noninternal/wire"
+	mocktls "github.com/tumi8/quic-go/noninternal/mocks/tls"
+	"github.com/tumi8/quic-go/noninternal/protocol"
+	"github.com/tumi8/quic-go/noninternal/qerr"
+	"github.com/tumi8/quic-go/noninternal/testdata"
+	"github.com/tumi8/quic-go/noninternal/utils"
+	"github.com/tumi8/quic-go/noninternal/wire"
 
 	"github.com/golang/mock/gomock"
 
@@ -260,7 +260,8 @@ var _ = Describe("Crypto Setup TLS", func() {
 		}
 
 		handshake := func(client CryptoSetup, cChunkChan <-chan chunk,
-			server CryptoSetup, sChunkChan <-chan chunk) {
+			server CryptoSetup, sChunkChan <-chan chunk,
+		) {
 			done := make(chan struct{})
 			go func() {
 				defer GinkgoRecover()
