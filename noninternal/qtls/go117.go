@@ -3,4 +3,4 @@
 
 package qtls
 
-var _ int = "The version of quic-go you're using can't be built on Go 1.17 yet."
+var _ string = "The version of quic-go you're using can't be built on Go 1.17 yet."
