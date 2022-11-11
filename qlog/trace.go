@@ -3,7 +3,7 @@ package qlog
 import (
 	"time"
 
-	"github.com/lucas-clemente/quic-go/logging"
+	"github.com/tumi8/quic-go/logging"
 
 	"github.com/francoispqt/gojay"
 
