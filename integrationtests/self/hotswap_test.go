@@ -16,7 +16,7 @@ import (
 	"github.com/lucas-clemente/quic-go/internal/protocol"
 	"github.com/lucas-clemente/quic-go/internal/testdata"
 
-	. "github.com/onsi/ginkgo"
+	. "github.com/onsi/ginkgo/v2"
 	. "github.com/onsi/gomega"
 	"github.com/onsi/gomega/gbytes"
 )
@@ -87,18 +87,14 @@ var _ = Describe("HTTP3 Server hotswap test", func() {
 		})
 
 		server1 = &http3.Server{
-			Server: &http.Server{
-				Handler:   mux1,
-				TLSConfig: testdata.GetTLSConfig(),
-			},
+			Handler:    mux1,
+			TLSConfig:  testdata.GetTLSConfig(),
 			QuicConfig: getQuicConfig(&quic.Config{Versions: versions}),
 		}
 
 		server2 = &http3.Server{
-			Server: &http.Server{
-				Handler:   mux2,
-				TLSConfig: testdata.GetTLSConfig(),
-			},
+			Handler:    mux2,
+			TLSConfig:  testdata.GetTLSConfig(),
 			QuicConfig: getQuicConfig(&quic.Config{Versions: versions}),
 		}
 

@@ -8,7 +8,7 @@ import (
 
 	"github.com/tumi8/quic-go/noninternal/utils"
 
-	. "github.com/onsi/ginkgo"
+	. "github.com/onsi/ginkgo/v2"
 	. "github.com/onsi/gomega"
 )
 
@@ -105,7 +105,7 @@ var _ = Describe("MTU Discoverer", func() {
 			}
 			diff := realMTU - currentMTU
 			Expect(diff).To(BeNumerically(">=", 0))
-			maxDiff = utils.MaxByteCount(maxDiff, diff)
+			maxDiff = utils.Max(maxDiff, diff)
 		}
 		Expect(maxDiff).To(BeEquivalentTo(maxMTUDiff))
 	})

@@ -12,7 +12,9 @@ import (
 	"github.com/golang/mock/gomock"
 	quic "github.com/tumi8/quic-go"
 	mockquic "github.com/tumi8/quic-go/noninternal/mocks/quic"
-	. "github.com/onsi/ginkgo"
+
+	. "github.com/onsi/ginkgo/v2"
+
 	. "github.com/onsi/gomega"
 )
 
@@ -20,7 +22,7 @@ type mockClient struct {
 	closed bool
 }
 
-func (m *mockClient) RoundTrip(req *http.Request) (*http.Response, error) {
+func (m *mockClient) RoundTripOpt(req *http.Request, _ RoundTripOpt) (*http.Response, error) {
 	return &http.Response{Request: req}, nil
 }
 
@@ -127,7 +129,7 @@ var _ = Describe("RoundTripper", func() {
 
 		It("uses the custom dialer, if provided", func() {
 			var dialed bool
-			dialer := func(_ context.Context, _, _ string, tlsCfgP *tls.Config, cfg *quic.Config) (quic.EarlyConnection, error) {
+			dialer := func(_ context.Context, _ string, tlsCfgP *tls.Config, cfg *quic.Config) (quic.EarlyConnection, error) {
 				dialed = true
 				return nil, errors.New("handshake error")
 			}

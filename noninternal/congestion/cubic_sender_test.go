@@ -5,7 +5,7 @@ import (
 
 	"github.com/tumi8/quic-go/noninternal/protocol"
 	"github.com/tumi8/quic-go/noninternal/utils"
-	. "github.com/onsi/ginkgo"
+	. "github.com/onsi/ginkgo/v2"
 	. "github.com/onsi/gomega"
 )
 

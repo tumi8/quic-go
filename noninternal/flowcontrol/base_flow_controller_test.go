@@ -8,11 +8,12 @@ import (
 	"github.com/tumi8/quic-go/noninternal/utils"
 
 	"github.com/tumi8/quic-go/noninternal/protocol"
-	. "github.com/onsi/ginkgo"
+	. "github.com/onsi/ginkgo/v2"
 	. "github.com/onsi/gomega"
 )
 
 // on the CIs, the timing is a lot less precise, so scale every duration by this factor
+//
 //nolint:unparam
 func scaleDuration(t time.Duration) time.Duration {
 	scaleFactor := 1

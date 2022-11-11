@@ -1,5 +1,4 @@
 //go:build windows
-// +build windows
 
 package quic
 
@@ -7,7 +6,7 @@ import (
 	"errors"
 	"syscall"
 
-	"github.com/lucas-clemente/quic-go/internal/utils"
+	"github.com/tumi8/quic-go/noninternal/utils"
 	"golang.org/x/sys/windows"
 )
 

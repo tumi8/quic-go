@@ -11,7 +11,7 @@ import (
 	"github.com/tumi8/quic-go/noninternal/utils"
 	"github.com/tumi8/quic-go/noninternal/wire"
 
-	. "github.com/onsi/ginkgo"
+	. "github.com/onsi/ginkgo/v2"
 	. "github.com/onsi/gomega"
 )
 
@@ -28,7 +28,7 @@ var _ = Describe("SentPacketHandler", func() {
 	JustBeforeEach(func() {
 		lostPackets = nil
 		rttStats := utils.NewRTTStats()
-		handler = newSentPacketHandler(42, protocol.InitialPacketSizeIPv4, rttStats, perspective, nil, utils.DefaultLogger)
+		handler = newSentPacketHandler(42, protocol.InitialPacketSizeIPv4, rttStats, false, perspective, nil, utils.DefaultLogger)
 		streamFrame = wire.StreamFrame{
 			StreamID: 5,
 			Data:     []byte{0x13, 0x37},
@@ -37,7 +37,7 @@ var _ = Describe("SentPacketHandler", func() {
 
 	getPacket := func(pn protocol.PacketNumber, encLevel protocol.EncryptionLevel) *Packet {
 		if el, ok := handler.getPacketNumberSpace(encLevel).history.packetMap[pn]; ok {
-			return &el.Value
+			return el.Value
 		}
 		return nil
 	}
@@ -189,7 +189,7 @@ var _ = Describe("SentPacketHandler", func() {
 				Expect(err).ToNot(HaveOccurred())
 				Expect(handler.appDataPackets.largestAcked).To(Equal(protocol.PacketNumber(3)))
 				// this wouldn't happen in practice
-				// for testing purposes, we pretend send a different ACK frame in a duplicated packet, to be able to verify that it actually doesn't get processed
+				// for testing purposes, we pretend to send a different ACK frame in a duplicated packet, to be able to verify that it actually doesn't get processed
 				_, err = handler.ReceivedAck(ack2, protocol.Encryption1RTT, time.Now())
 				Expect(err).ToNot(HaveOccurred())
 				Expect(handler.appDataPackets.largestAcked).To(Equal(protocol.PacketNumber(4)))
@@ -940,6 +940,26 @@ var _ = Describe("SentPacketHandler", func() {
 			Expect(handler.GetLossDetectionTimeout()).ToNot(BeZero())
 			handler.ReceivedAck(&wire.AckFrame{AckRanges: []wire.AckRange{{Smallest: 3, Largest: 4}}}, protocol.EncryptionHandshake, time.Now())
 			Expect(handler.GetLossDetectionTimeout()).To(BeZero())
+		})
+	})
+
+	Context("amplification limit, for the server, with validated address", func() {
+		JustBeforeEach(func() {
+			rttStats := utils.NewRTTStats()
+			handler = newSentPacketHandler(42, protocol.InitialPacketSizeIPv4, rttStats, true, perspective, nil, utils.DefaultLogger)
+		})
+
+		It("do not limits the window", func() {
+			handler.ReceivedBytes(0)
+			Expect(handler.SendMode()).To(Equal(SendAny))
+			handler.SentPacket(&Packet{
+				PacketNumber:    1,
+				Length:          900,
+				EncryptionLevel: protocol.EncryptionInitial,
+				Frames:          []Frame{{Frame: &wire.PingFrame{}}},
+				SendTime:        time.Now(),
+			})
+			Expect(handler.SendMode()).To(Equal(SendAny))
 		})
 	})
 
