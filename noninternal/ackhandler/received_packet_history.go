@@ -4,12 +4,20 @@ import (
 	"github.com/tumi8/quic-go/noninternal/protocol"
 	list "github.com/tumi8/quic-go/noninternal/utils/linkedlist"
 	"github.com/tumi8/quic-go/noninternal/wire"
+
+	"sync"
 )
 
 // interval is an interval from one PacketNumber to the other
 type interval struct {
 	Start protocol.PacketNumber
 	End   protocol.PacketNumber
+}
+
+var intervalElementPool sync.Pool
+
+func init() {
+	intervalElementPool = *list.NewPool[interval]()
 }
 
 // The receivedPacketHistory stores if a packet number has already been received.
@@ -23,7 +31,7 @@ type receivedPacketHistory struct {
 
 func newReceivedPacketHistory() *receivedPacketHistory {
 	return &receivedPacketHistory{
-		ranges: list.New[interval](),
+		ranges: list.NewWithPool[interval](&intervalElementPool),
 	}
 }
 

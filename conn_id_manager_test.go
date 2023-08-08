@@ -4,9 +4,9 @@ import (
 
 	. "github.com/onsi/ginkgo/v2"
 	. "github.com/onsi/gomega"
-	protocol "github.com/tumi8/quic-go/noninternal/protocol"
+	"github.com/tumi8/quic-go/noninternal/protocol"
 	"github.com/tumi8/quic-go/noninternal/qerr"
-	wire "github.com/tumi8/quic-go/noninternal/wire"
+	"github.com/tumi8/quic-go/noninternal/wire"
 )
 
 var _ = Describe("Connection ID Manager", func() {

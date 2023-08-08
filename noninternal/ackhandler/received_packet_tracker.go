@@ -31,21 +31,17 @@ type receivedPacketTracker struct {
 	lastAck                                 *wire.AckFrame
 
 	logger utils.Logger
-
-	version protocol.VersionNumber
 }
 
 func newReceivedPacketTracker(
 	rttStats *utils.RTTStats,
 	logger utils.Logger,
-	version protocol.VersionNumber,
 ) *receivedPacketTracker {
 	return &receivedPacketTracker{
 		packetHistory: newReceivedPacketHistory(),
 		maxAckDelay:   protocol.MaxAckDelay,
 		rttStats:      rttStats,
 		logger:        logger,
-		version:       version,
 	}
 }
 
@@ -173,16 +169,18 @@ func (h *receivedPacketTracker) GetAckFrame(onlyIfQueued bool) *wire.AckFrame {
 		}
 	}
 
-	ack := wire.GetAckFrame()
+	// This function always returns the same ACK frame struct, filled with the most recent values.
+	ack := h.lastAck
+	if ack == nil {
+		ack = &wire.AckFrame{}
+	}
+	ack.Reset()
 	ack.DelayTime = utils.Max(0, now.Sub(h.largestObservedReceivedTime))
 	ack.ECT0 = h.ect0
 	ack.ECT1 = h.ect1
 	ack.ECNCE = h.ecnce
 	ack.AckRanges = h.packetHistory.AppendAckRanges(ack.AckRanges)
 
-	if h.lastAck != nil {
-		wire.PutAckFrame(h.lastAck)
-	}
 	h.lastAck = ack
 	h.ackAlarm = time.Time{}
 	h.ackQueued = false

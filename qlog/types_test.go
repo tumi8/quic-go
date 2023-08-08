@@ -90,7 +90,7 @@ var _ = Describe("Types", func() {
 			if !ok {
 				panic("Failed to get current frame")
 			}
-			filename := path.Join(path.Dir(thisfile), "../internal/qerr/error_codes.go")
+			filename := path.Join(path.Dir(thisfile), "../noninternal/qerr/error_codes.go")
 			fileAst, err := parser.ParseFile(gotoken.NewFileSet(), filename, nil, 0)
 			Expect(err).NotTo(HaveOccurred())
 			constSpecs := fileAst.Decls[2].(*ast.GenDecl).Specs

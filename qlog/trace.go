@@ -4,10 +4,9 @@ import (
 	"time"
 
 	"github.com/tumi8/quic-go/logging"
-
+	"github.com/tumi8/quic-go/noninternal/protocol"
 	"github.com/francoispqt/gojay"
 
-	"github.com/tumi8/quic-go/noninternal/protocol"
 )
 
 type topLevel struct {
@@ -19,8 +18,17 @@ func (l topLevel) MarshalJSONObject(enc *gojay.Encoder) {
 	enc.StringKey("qlog_format", "NDJSON")
 	enc.StringKey("qlog_version", "draft-02")
 	enc.StringKeyOmitEmpty("title", "quic-go qlog")
-	enc.StringKey("code_version", quicGoVersion)
+	enc.ObjectKey("configuration", configuration{Version: quicGoVersion})
 	enc.ObjectKey("trace", l.trace)
+}
+
+type configuration struct {
+	Version string
+}
+
+func (c configuration) IsNil() bool { return false }
+func (c configuration) MarshalJSONObject(enc *gojay.Encoder) {
+	enc.StringKey("code_version", c.Version)
 }
 
 type vantagePoint struct {

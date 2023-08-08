@@ -1,7 +1,6 @@
 package wire
 
 import (
-
 	"github.com/tumi8/quic-go/noninternal/protocol"
 )
 
@@ -13,6 +12,6 @@ type Frame interface {
 
 // A FrameParser parses QUIC frames, one by one.
 type FrameParser interface {
-	ParseNext([]byte, protocol.EncryptionLevel) (int, Frame, error)
+	ParseNext([]byte, protocol.EncryptionLevel, protocol.VersionNumber) (int, Frame, error)
 	SetAckDelayExponent(uint8)
 }

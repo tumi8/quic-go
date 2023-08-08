@@ -149,13 +149,12 @@ func (e eventConnectionClosed) MarshalJSONObject(enc *gojay.Encoder) {
 		enc.StringKey("connection_code", transportError(transportErr.ErrorCode).String())
 		enc.StringKey("reason", transportErr.ErrorMessage)
 	case errors.As(e.e, &versionNegotiationErr):
-		enc.StringKey("owner", ownerRemote.String())
-		enc.StringKey("trigger", "version_negotiation")
+		enc.StringKey("trigger", "version_mismatch")
 	}
 }
 
 type eventPacketSent struct {
-	Header        packetHeader
+	Header        gojay.MarshalerJSONObject // either a shortHeader or a packetHeader
 	Length        logging.ByteCount
 	PayloadLength logging.ByteCount
 	Frames        frames

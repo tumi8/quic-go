@@ -2,7 +2,6 @@ package wire
 
 import (
 	"encoding/binary"
-	mrand "math/rand"
 
 	"golang.org/x/exp/rand"
 
@@ -14,7 +13,7 @@ import (
 var _ = Describe("Version Negotiation Packets", func() {
 	randConnID := func(l int) protocol.ArbitraryLenConnectionID {
 		b := make(protocol.ArbitraryLenConnectionID, l)
-		_, err := mrand.Read(b)
+		_, err := rand.Read(b)
 		Expect(err).ToNot(HaveOccurred())
 		return b
 	}

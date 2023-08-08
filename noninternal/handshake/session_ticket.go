@@ -10,7 +10,7 @@ import (
 	"github.com/tumi8/quic-go/quicvarint"
 )
 
-const sessionTicketRevision = 2
+const sessionTicketRevision = 3
 
 type sessionTicket struct {
 	Parameters *wire.TransportParameters

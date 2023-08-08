@@ -3,9 +3,10 @@ package main
 import (
 	"log"
 	"math"
-	"math/rand"
 	"net"
 	"time"
+
+	"golang.org/x/exp/rand"
 
 	"github.com/tumi8/quic-go/fuzzing/internal/helper"
 	"github.com/tumi8/quic-go/fuzzing/transportparameters"
@@ -39,7 +40,7 @@ func main() {
 			MaxUniStreamNum:                protocol.StreamNum(getRandomValue()),
 			MaxBidiStreamNum:               protocol.StreamNum(getRandomValue()),
 			MaxIdleTimeout:                 time.Duration(getRandomValue()),
-			ActiveConnectionIDLimit:        getRandomValue(),
+			ActiveConnectionIDLimit:        getRandomValue() + 2,
 		}
 		if rand.Int()%2 == 0 {
 			tp.OriginalDestinationConnectionID = protocol.ParseConnectionID(getRandomData(rand.Intn(21)))

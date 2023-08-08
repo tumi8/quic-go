@@ -5,6 +5,8 @@ import (
 	"github.com/tumi8/quic-go"
 	mockquic "github.com/tumi8/quic-go/noninternal/mocks/quic"
 
+	"github.com/tumi8/quic-go"
+	mockquic "github.com/tumi8/quic-go/noninternal/mocks/quic"
 
 	"github.com/golang/mock/gomock"
 	. "github.com/onsi/ginkgo/v2"
@@ -39,14 +41,14 @@ var _ = Describe("Response Body", func() {
 	It("closes responses", func() {
 		str := mockquic.NewMockStream(mockCtrl)
 		rb := newResponseBody(str, nil, reqDone)
-		str.EXPECT().CancelRead(quic.StreamErrorCode(errorRequestCanceled))
+		str.EXPECT().CancelRead(quic.StreamErrorCode(ErrCodeRequestCanceled))
 		Expect(rb.Close()).To(Succeed())
 	})
 
 	It("allows multiple calls to Close", func() {
 		str := mockquic.NewMockStream(mockCtrl)
 		rb := newResponseBody(str, nil, reqDone)
-		str.EXPECT().CancelRead(quic.StreamErrorCode(errorRequestCanceled)).MaxTimes(2)
+		str.EXPECT().CancelRead(quic.StreamErrorCode(ErrCodeRequestCanceled)).MaxTimes(2)
 		Expect(rb.Close()).To(Succeed())
 		Expect(reqDone).To(BeClosed())
 		Expect(rb.Close()).To(Succeed())
