@@ -671,6 +671,7 @@ func (s *connection) ConnectionState() ConnectionState {
 	defer s.connStateMutex.Unlock()
 	cs := s.cryptoStreamHandler.ConnectionState()
 	s.connState.TLS = cs.ConnectionState
+	s.connState.Info = cs.ConnectionInfo
 	s.connState.Used0RTT = cs.Used0RTT
 	return s.connState
 }

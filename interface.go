@@ -10,6 +10,7 @@ import (
 
 	"github.com/tumi8/quic-go/noninternal/handshake"
 	"github.com/tumi8/quic-go/noninternal/protocol"
+	"github.com/tumi8/quic-go/noninternal/qtls"
 	"github.com/tumi8/quic-go/logging"
 )
 
@@ -354,6 +355,7 @@ type ConnectionState struct {
 	// This requires both nodes to support and enable the datagram extensions (via Config.EnableDatagrams).
 	// If datagram support was negotiated, datagrams can be sent and received using the
 	// SendMessage and ReceiveMessage methods on the Connection.
+	Info qtls.QUICConn
 	SupportsDatagrams bool
 	// Used0RTT says if 0-RTT resumption was used.
 	Used0RTT bool

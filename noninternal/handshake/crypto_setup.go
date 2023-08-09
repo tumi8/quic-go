@@ -668,9 +668,11 @@ func (h *cryptoSetup) ConnectionState() ConnectionState {
 		TLSUnique: tmp.TLSUnique,
 	}
 
+
 	return ConnectionState{
 		ConnectionState: tmp_state,
 		Used0RTT:        h.used0RTT.Load(),
+		ConnectionInfo: *h.conn,
 	}
 }
 

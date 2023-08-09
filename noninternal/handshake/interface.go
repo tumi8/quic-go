@@ -6,6 +6,7 @@ import (
 	"io"
 	"time"
 
+	"github.com/tumi8/quic-go/noninternal/qtls"
 	"github.com/tumi8/quic-go/noninternal/protocol"
 	"github.com/tumi8/quic-go/noninternal/wire"
 )
@@ -56,6 +57,7 @@ type ShortHeaderSealer interface {
 type ConnectionState struct {
 	tls.ConnectionState
 	Used0RTT bool
+	ConnectionInfo qtls.QUICConn
 }
 
 // EventKind is the kind of handshake event.
