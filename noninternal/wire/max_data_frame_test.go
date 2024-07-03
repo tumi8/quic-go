@@ -1,7 +1,7 @@
 package wire
 
 import (
-	"bytes"
+	"io"
 
 	"github.com/tumi8/quic-go/noninternal/protocol"
 	"github.com/tumi8/quic-go/quicvarint"
@@ -13,23 +13,21 @@ import (
 var _ = Describe("MAX_DATA frame", func() {
 	Context("when parsing", func() {
 		It("accepts sample frame", func() {
-			data := []byte{0x10}
-			data = append(data, encodeVarInt(0xdecafbad123456)...) // byte offset
-			b := bytes.NewReader(data)
-			frame, err := parseMaxDataFrame(b, protocol.Version1)
+			data := encodeVarInt(0xdecafbad123456) // byte offset
+			frame, l, err := parseMaxDataFrame(data, protocol.Version1)
 			Expect(err).ToNot(HaveOccurred())
 			Expect(frame.MaximumData).To(Equal(protocol.ByteCount(0xdecafbad123456)))
-			Expect(b.Len()).To(BeZero())
+			Expect(l).To(Equal(len(data)))
 		})
 
 		It("errors on EOFs", func() {
-			data := []byte{0x10}
-			data = append(data, encodeVarInt(0xdecafbad1234567)...) // byte offset
-			_, err := parseMaxDataFrame(bytes.NewReader(data), protocol.Version1)
+			data := encodeVarInt(0xdecafbad1234567) // byte offset
+			_, l, err := parseMaxDataFrame(data, protocol.Version1)
 			Expect(err).NotTo(HaveOccurred())
+			Expect(l).To(Equal(len(data)))
 			for i := range data {
-				_, err := parseMaxDataFrame(bytes.NewReader(data[0:i]), protocol.Version1)
-				Expect(err).To(HaveOccurred())
+				_, _, err := parseMaxDataFrame(data[:i], protocol.Version1)
+				Expect(err).To(MatchError(io.EOF))
 			}
 		})
 	})
@@ -39,7 +37,7 @@ var _ = Describe("MAX_DATA frame", func() {
 			f := &MaxDataFrame{
 				MaximumData: 0xdeadbeef,
 			}
-			Expect(f.Length(protocol.Version1)).To(Equal(1 + quicvarint.Len(0xdeadbeef)))
+			Expect(f.Length(protocol.Version1)).To(BeEquivalentTo(1 + quicvarint.Len(0xdeadbeef)))
 		})
 
 		It("writes a MAX_DATA frame", func() {
@@ -48,7 +46,7 @@ var _ = Describe("MAX_DATA frame", func() {
 			}
 			b, err := f.Append(nil, protocol.Version1)
 			Expect(err).ToNot(HaveOccurred())
-			expected := []byte{0x10}
+			expected := []byte{maxDataFrameType}
 			expected = append(expected, encodeVarInt(0xdeadbeefcafe)...)
 			Expect(b).To(Equal(expected))
 		})

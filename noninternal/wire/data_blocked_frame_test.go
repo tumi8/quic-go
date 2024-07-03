@@ -1,7 +1,6 @@
 package wire
 
 import (
-	"bytes"
 	"io"
 
 	"github.com/tumi8/quic-go/noninternal/protocol"
@@ -14,22 +13,20 @@ import (
 var _ = Describe("DATA_BLOCKED frame", func() {
 	Context("when parsing", func() {
 		It("accepts sample frame", func() {
-			data := []byte{0x14}
-			data = append(data, encodeVarInt(0x12345678)...)
-			b := bytes.NewReader(data)
-			frame, err := parseDataBlockedFrame(b, protocol.Version1)
+			data := encodeVarInt(0x12345678)
+			frame, l, err := parseDataBlockedFrame(data, protocol.Version1)
 			Expect(err).ToNot(HaveOccurred())
 			Expect(frame.MaximumData).To(Equal(protocol.ByteCount(0x12345678)))
-			Expect(b.Len()).To(BeZero())
+			Expect(l).To(Equal(len(data)))
 		})
 
 		It("errors on EOFs", func() {
-			data := []byte{0x14}
-			data = append(data, encodeVarInt(0x12345678)...)
-			_, err := parseDataBlockedFrame(bytes.NewReader(data), protocol.Version1)
+			data := encodeVarInt(0x12345678)
+			_, l, err := parseDataBlockedFrame(data, protocol.Version1)
 			Expect(err).ToNot(HaveOccurred())
+			Expect(l).To(Equal(len(data)))
 			for i := range data {
-				_, err := parseDataBlockedFrame(bytes.NewReader(data[:i]), protocol.Version1)
+				_, _, err := parseDataBlockedFrame(data[:i], protocol.Version1)
 				Expect(err).To(MatchError(io.EOF))
 			}
 		})
@@ -38,16 +35,16 @@ var _ = Describe("DATA_BLOCKED frame", func() {
 	Context("when writing", func() {
 		It("writes a sample frame", func() {
 			frame := DataBlockedFrame{MaximumData: 0xdeadbeef}
-			b, err := frame.Append(nil, protocol.VersionWhatever)
+			b, err := frame.Append(nil, protocol.Version1)
 			Expect(err).ToNot(HaveOccurred())
-			expected := []byte{0x14}
+			expected := []byte{dataBlockedFrameType}
 			expected = append(expected, encodeVarInt(0xdeadbeef)...)
 			Expect(b).To(Equal(expected))
 		})
 
 		It("has the correct min length", func() {
 			frame := DataBlockedFrame{MaximumData: 0x12345}
-			Expect(frame.Length(protocol.Version1)).To(Equal(1 + quicvarint.Len(0x12345)))
+			Expect(frame.Length(protocol.Version1)).To(BeEquivalentTo(1 + quicvarint.Len(0x12345)))
 		})
 	})
 })

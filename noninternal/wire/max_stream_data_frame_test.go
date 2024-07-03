@@ -1,7 +1,7 @@
 package wire
 
 import (
-	"bytes"
+	"io"
 
 	"github.com/tumi8/quic-go/noninternal/protocol"
 	"github.com/tumi8/quic-go/quicvarint"
@@ -13,26 +13,24 @@ import (
 var _ = Describe("MAX_STREAM_DATA frame", func() {
 	Context("parsing", func() {
 		It("accepts sample frame", func() {
-			data := []byte{0x11}
-			data = append(data, encodeVarInt(0xdeadbeef)...) // Stream ID
+			data := encodeVarInt(0xdeadbeef)                 // Stream ID
 			data = append(data, encodeVarInt(0x12345678)...) // Offset
-			b := bytes.NewReader(data)
-			frame, err := parseMaxStreamDataFrame(b, protocol.Version1)
+			frame, l, err := parseMaxStreamDataFrame(data, protocol.Version1)
 			Expect(err).ToNot(HaveOccurred())
 			Expect(frame.StreamID).To(Equal(protocol.StreamID(0xdeadbeef)))
 			Expect(frame.MaximumStreamData).To(Equal(protocol.ByteCount(0x12345678)))
-			Expect(b.Len()).To(BeZero())
+			Expect(l).To(Equal(len(data)))
 		})
 
 		It("errors on EOFs", func() {
-			data := []byte{0x11}
-			data = append(data, encodeVarInt(0xdeadbeef)...) // Stream ID
+			data := encodeVarInt(0xdeadbeef)                 // Stream ID
 			data = append(data, encodeVarInt(0x12345678)...) // Offset
-			_, err := parseMaxStreamDataFrame(bytes.NewReader(data), protocol.Version1)
+			_, l, err := parseMaxStreamDataFrame(data, protocol.Version1)
 			Expect(err).NotTo(HaveOccurred())
+			Expect(l).To(Equal(len(data)))
 			for i := range data {
-				_, err := parseMaxStreamDataFrame(bytes.NewReader(data[0:i]), protocol.Version1)
-				Expect(err).To(HaveOccurred())
+				_, _, err := parseMaxStreamDataFrame(data[:i], protocol.Version1)
+				Expect(err).To(MatchError(io.EOF))
 			}
 		})
 	})
@@ -43,7 +41,7 @@ var _ = Describe("MAX_STREAM_DATA frame", func() {
 				StreamID:          0x1337,
 				MaximumStreamData: 0xdeadbeef,
 			}
-			Expect(f.Length(protocol.VersionWhatever)).To(Equal(1 + quicvarint.Len(uint64(f.StreamID)) + quicvarint.Len(uint64(f.MaximumStreamData))))
+			Expect(f.Length(protocol.Version1)).To(BeEquivalentTo(1 + quicvarint.Len(uint64(f.StreamID)) + quicvarint.Len(uint64(f.MaximumStreamData))))
 		})
 
 		It("writes a sample frame", func() {
@@ -51,7 +49,7 @@ var _ = Describe("MAX_STREAM_DATA frame", func() {
 				StreamID:          0xdecafbad,
 				MaximumStreamData: 0xdeadbeefcafe42,
 			}
-			expected := []byte{0x11}
+			expected := []byte{maxStreamDataFrameType}
 			expected = append(expected, encodeVarInt(0xdecafbad)...)
 			expected = append(expected, encodeVarInt(0xdeadbeefcafe42)...)
 			b, err := f.Append(nil, protocol.Version1)

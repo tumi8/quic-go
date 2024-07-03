@@ -5,9 +5,9 @@ import (
 	"strconv"
 	"time"
 
+	"github.com/tumi8/quic-go/noninternal/protocol"
 	"github.com/tumi8/quic-go/noninternal/utils"
 
-	"github.com/tumi8/quic-go/noninternal/protocol"
 	. "github.com/onsi/ginkgo/v2"
 	. "github.com/onsi/gomega"
 )
@@ -59,9 +59,9 @@ var _ = Describe("Base Flow controller", func() {
 		})
 
 		It("does not decrease the flow control window", func() {
-			controller.UpdateSendWindow(20)
+			Expect(controller.UpdateSendWindow(20)).To(BeTrue())
 			Expect(controller.sendWindowSize()).To(Equal(protocol.ByteCount(20)))
-			controller.UpdateSendWindow(10)
+			Expect(controller.UpdateSendWindow(10)).To(BeFalse())
 			Expect(controller.sendWindowSize()).To(Equal(protocol.ByteCount(20)))
 		})
 

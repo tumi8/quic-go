@@ -10,17 +10,17 @@ import (
 	"sync/atomic"
 	"time"
 
-	quic "github.com/tumi8/quic-go"
+	"github.com/tumi8/quic-go"
 
 	. "github.com/onsi/ginkgo/v2"
 	. "github.com/onsi/gomega"
 )
 
-var _ = Describe("Stream Cancelations", func() {
+var _ = Describe("Stream Cancellations", func() {
 	const numStreams = 80
 
 	Context("canceling the read side", func() {
-		var server quic.Listener
+		var server *quic.Listener
 
 		// The server accepts a single connection, and then opens numStreams unidirectional streams.
 		// On each of these streams, it (tries to) write PRData.
@@ -31,7 +31,7 @@ var _ = Describe("Stream Cancelations", func() {
 			server, err = quic.ListenAddr("localhost:0", getTLSConfig(), getQuicConfig(nil))
 			Expect(err).ToNot(HaveOccurred())
 
-			var canceledCounter int32
+			var canceledCounter atomic.Int32
 			go func() {
 				defer GinkgoRecover()
 				var wg sync.WaitGroup
@@ -45,22 +45,23 @@ var _ = Describe("Stream Cancelations", func() {
 						str, err := conn.OpenUniStreamSync(context.Background())
 						Expect(err).ToNot(HaveOccurred())
 						if _, err := str.Write(data); err != nil {
-							Expect(err).To(MatchError(&quic.StreamError{
+							Expect(err).To(Equal(&quic.StreamError{
 								StreamID:  str.StreamID(),
 								ErrorCode: quic.StreamErrorCode(str.StreamID()),
+								Remote:    true,
 							}))
-							atomic.AddInt32(&canceledCounter, 1)
+							canceledCounter.Add(1)
 							return
 						}
 						if err := str.Close(); err != nil {
 							Expect(err).To(MatchError(fmt.Sprintf("close called for canceled stream %d", str.StreamID())))
-							atomic.AddInt32(&canceledCounter, 1)
+							canceledCounter.Add(1)
 							return
 						}
 					}()
 				}
 				wg.Wait()
-				numCanceledStreamsChan <- atomic.LoadInt32(&canceledCounter)
+				numCanceledStreamsChan <- canceledCounter.Load()
 			}()
 			return numCanceledStreamsChan
 		}
@@ -72,13 +73,14 @@ var _ = Describe("Stream Cancelations", func() {
 		It("downloads when the client immediately cancels most streams", func() {
 			serverCanceledCounterChan := runServer(PRData)
 			conn, err := quic.DialAddr(
+				context.Background(),
 				fmt.Sprintf("localhost:%d", server.Addr().(*net.UDPAddr).Port),
 				getTLSClientConfig(),
 				getQuicConfig(&quic.Config{MaxIncomingUniStreams: numStreams / 2}),
 			)
 			Expect(err).ToNot(HaveOccurred())
 
-			var canceledCounter int32
+			var canceledCounter atomic.Int32
 			var wg sync.WaitGroup
 			wg.Add(numStreams)
 			for i := 0; i < numStreams; i++ {
@@ -89,8 +91,15 @@ var _ = Describe("Stream Cancelations", func() {
 					Expect(err).ToNot(HaveOccurred())
 					// cancel around 2/3 of the streams
 					if rand.Int31()%3 != 0 {
-						atomic.AddInt32(&canceledCounter, 1)
-						str.CancelRead(quic.StreamErrorCode(str.StreamID()))
+						canceledCounter.Add(1)
+						resetErr := quic.StreamErrorCode(str.StreamID())
+						str.CancelRead(resetErr)
+						_, err := str.Read([]byte{0})
+						Expect(err).To(Equal(&quic.StreamError{
+							StreamID:  str.StreamID(),
+							ErrorCode: resetErr,
+							Remote:    false,
+						}))
 						return
 					}
 					data, err := io.ReadAll(str)
@@ -104,7 +113,7 @@ var _ = Describe("Stream Cancelations", func() {
 			Eventually(serverCanceledCounterChan).Should(Receive(&serverCanceledCounter))
 			Expect(conn.CloseWithError(0, "")).To(Succeed())
 
-			clientCanceledCounter := atomic.LoadInt32(&canceledCounter)
+			clientCanceledCounter := canceledCounter.Load()
 			// The server will only count a stream as being reset if learns about the cancelation before it finished writing all data.
 			Expect(clientCanceledCounter).To(BeNumerically(">=", serverCanceledCounter))
 			fmt.Fprintf(GinkgoWriter, "Canceled reading on %d of %d streams.\n", clientCanceledCounter, numStreams)
@@ -116,13 +125,14 @@ var _ = Describe("Stream Cancelations", func() {
 			serverCanceledCounterChan := runServer(PRData)
 
 			conn, err := quic.DialAddr(
+				context.Background(),
 				fmt.Sprintf("localhost:%d", server.Addr().(*net.UDPAddr).Port),
 				getTLSClientConfig(),
 				getQuicConfig(&quic.Config{MaxIncomingUniStreams: numStreams / 2}),
 			)
 			Expect(err).ToNot(HaveOccurred())
 
-			var canceledCounter int32
+			var canceledCounter atomic.Int32
 			var wg sync.WaitGroup
 			wg.Add(numStreams)
 			for i := 0; i < numStreams; i++ {
@@ -138,7 +148,7 @@ var _ = Describe("Stream Cancelations", func() {
 						Expect(err).ToNot(HaveOccurred())
 						str.CancelRead(quic.StreamErrorCode(str.StreamID()))
 						Expect(data).To(Equal(PRData[:length]))
-						atomic.AddInt32(&canceledCounter, 1)
+						canceledCounter.Add(1)
 						return
 					}
 					data, err := io.ReadAll(str)
@@ -152,7 +162,7 @@ var _ = Describe("Stream Cancelations", func() {
 			Eventually(serverCanceledCounterChan).Should(Receive(&serverCanceledCounter))
 			Expect(conn.CloseWithError(0, "")).To(Succeed())
 
-			clientCanceledCounter := atomic.LoadInt32(&canceledCounter)
+			clientCanceledCounter := canceledCounter.Load()
 			// The server will only count a stream as being reset if learns about the cancelation before it finished writing all data.
 			Expect(clientCanceledCounter).To(BeNumerically(">=", serverCanceledCounter))
 			fmt.Fprintf(GinkgoWriter, "Canceled reading on %d of %d streams.\n", clientCanceledCounter, numStreams)
@@ -162,10 +172,11 @@ var _ = Describe("Stream Cancelations", func() {
 
 		It("allows concurrent Read and CancelRead calls", func() {
 			// This test is especially valuable when run with race detector,
-			// see https://github.com/lucas-clemente/quic-go/issues/3239.
+			// see https://github.com/tumi8/quic-go/issues/3239.
 			serverCanceledCounterChan := runServer(make([]byte, 100)) // make sure the FIN is sent with the STREAM frame
 
 			conn, err := quic.DialAddr(
+				context.Background(),
 				fmt.Sprintf("localhost:%d", server.Addr().(*net.UDPAddr).Port),
 				getTLSClientConfig(),
 				getQuicConfig(&quic.Config{MaxIncomingUniStreams: numStreams / 2}),
@@ -174,7 +185,7 @@ var _ = Describe("Stream Cancelations", func() {
 
 			var wg sync.WaitGroup
 			wg.Add(numStreams)
-			var counter int32
+			var counter atomic.Int32
 			for i := 0; i < numStreams; i++ {
 				go func() {
 					defer GinkgoRecover()
@@ -188,8 +199,12 @@ var _ = Describe("Stream Cancelations", func() {
 						defer close(done)
 						b := make([]byte, 32)
 						if _, err := str.Read(b); err != nil {
-							atomic.AddInt32(&counter, 1)
-							Expect(err.Error()).To(ContainSubstring("canceled with error code 1234"))
+							counter.Add(1)
+							Expect(err).To(Equal(&quic.StreamError{
+								StreamID:  str.StreamID(),
+								ErrorCode: 1234,
+								Remote:    false,
+							}))
 							return
 						}
 					}()
@@ -199,7 +214,7 @@ var _ = Describe("Stream Cancelations", func() {
 			}
 			wg.Wait()
 			Expect(conn.CloseWithError(0, "")).To(Succeed())
-			numCanceled := atomic.LoadInt32(&counter)
+			numCanceled := counter.Load()
 			fmt.Fprintf(GinkgoWriter, "canceled %d out of %d streams", numCanceled, numStreams)
 			Expect(numCanceled).ToNot(BeZero())
 			Eventually(serverCanceledCounterChan).Should(Receive())
@@ -207,8 +222,9 @@ var _ = Describe("Stream Cancelations", func() {
 	})
 
 	Context("canceling the write side", func() {
-		runClient := func(server quic.Listener) int32 /* number of canceled streams */ {
+		runClient := func(server *quic.Listener) int32 /* number of canceled streams */ {
 			conn, err := quic.DialAddr(
+				context.Background(),
 				fmt.Sprintf("localhost:%d", server.Addr().(*net.UDPAddr).Port),
 				getTLSClientConfig(),
 				getQuicConfig(&quic.Config{MaxIncomingUniStreams: numStreams / 2}),
@@ -216,7 +232,7 @@ var _ = Describe("Stream Cancelations", func() {
 			Expect(err).ToNot(HaveOccurred())
 
 			var wg sync.WaitGroup
-			var counter int32
+			var counter atomic.Int32
 			wg.Add(numStreams)
 			for i := 0; i < numStreams; i++ {
 				go func() {
@@ -226,7 +242,7 @@ var _ = Describe("Stream Cancelations", func() {
 					Expect(err).ToNot(HaveOccurred())
 					data, err := io.ReadAll(str)
 					if err != nil {
-						atomic.AddInt32(&counter, 1)
+						counter.Add(1)
 						Expect(err).To(MatchError(&quic.StreamError{
 							StreamID:  str.StreamID(),
 							ErrorCode: quic.StreamErrorCode(str.StreamID()),
@@ -238,7 +254,7 @@ var _ = Describe("Stream Cancelations", func() {
 			}
 			wg.Wait()
 
-			streamCount := atomic.LoadInt32(&counter)
+			streamCount := counter.Load()
 			fmt.Fprintf(GinkgoWriter, "Canceled writing on %d of %d streams\n", streamCount, numStreams)
 			Expect(streamCount).To(BeNumerically(">", numStreams/10))
 			Expect(numStreams - streamCount).To(BeNumerically(">", numStreams/10))
@@ -251,7 +267,7 @@ var _ = Describe("Stream Cancelations", func() {
 			server, err := quic.ListenAddr("localhost:0", getTLSConfig(), nil)
 			Expect(err).ToNot(HaveOccurred())
 
-			var canceledCounter int32
+			var canceledCounter atomic.Int32
 			go func() {
 				defer GinkgoRecover()
 				conn, err := server.Accept(context.Background())
@@ -264,7 +280,7 @@ var _ = Describe("Stream Cancelations", func() {
 						// cancel about 2/3 of the streams
 						if rand.Int31()%3 != 0 {
 							str.CancelWrite(quic.StreamErrorCode(str.StreamID()))
-							atomic.AddInt32(&canceledCounter, 1)
+							canceledCounter.Add(1)
 							return
 						}
 						_, err = str.Write(PRData)
@@ -275,14 +291,14 @@ var _ = Describe("Stream Cancelations", func() {
 			}()
 
 			clientCanceledStreams := runClient(server)
-			Expect(clientCanceledStreams).To(Equal(atomic.LoadInt32(&canceledCounter)))
+			Expect(clientCanceledStreams).To(Equal(canceledCounter.Load()))
 		})
 
 		It("downloads when the server cancels some streams after sending some data", func() {
 			server, err := quic.ListenAddr("localhost:0", getTLSConfig(), nil)
 			Expect(err).ToNot(HaveOccurred())
 
-			var canceledCounter int32
+			var canceledCounter atomic.Int32
 			go func() {
 				defer GinkgoRecover()
 				conn, err := server.Accept(context.Background())
@@ -298,7 +314,7 @@ var _ = Describe("Stream Cancelations", func() {
 							_, err = str.Write(PRData[:length])
 							Expect(err).ToNot(HaveOccurred())
 							str.CancelWrite(quic.StreamErrorCode(str.StreamID()))
-							atomic.AddInt32(&canceledCounter, 1)
+							canceledCounter.Add(1)
 							return
 						}
 						_, err = str.Write(PRData)
@@ -309,7 +325,7 @@ var _ = Describe("Stream Cancelations", func() {
 			}()
 
 			clientCanceledStreams := runClient(server)
-			Expect(clientCanceledStreams).To(Equal(atomic.LoadInt32(&canceledCounter)))
+			Expect(clientCanceledStreams).To(Equal(canceledCounter.Load()))
 		})
 	})
 
@@ -354,6 +370,7 @@ var _ = Describe("Stream Cancelations", func() {
 			}()
 
 			conn, err := quic.DialAddr(
+				context.Background(),
 				fmt.Sprintf("localhost:%d", server.Addr().(*net.UDPAddr).Port),
 				getTLSClientConfig(),
 				getQuicConfig(&quic.Config{MaxIncomingUniStreams: numStreams / 2}),
@@ -361,7 +378,7 @@ var _ = Describe("Stream Cancelations", func() {
 			Expect(err).ToNot(HaveOccurred())
 
 			var wg sync.WaitGroup
-			var counter int32
+			var counter atomic.Int32
 			wg.Add(numStreams)
 			for i := 0; i < numStreams; i++ {
 				go func() {
@@ -382,13 +399,13 @@ var _ = Describe("Stream Cancelations", func() {
 						}))
 						return
 					}
-					atomic.AddInt32(&counter, 1)
+					counter.Add(1)
 					Expect(data).To(Equal(PRData))
 				}()
 			}
 			wg.Wait()
 
-			count := atomic.LoadInt32(&counter)
+			count := counter.Load()
 			Expect(count).To(BeNumerically(">", numStreams/15))
 			fmt.Fprintf(GinkgoWriter, "Successfully read from %d of %d streams.\n", count, numStreams)
 
@@ -439,6 +456,7 @@ var _ = Describe("Stream Cancelations", func() {
 			}()
 
 			conn, err := quic.DialAddr(
+				context.Background(),
 				fmt.Sprintf("localhost:%d", server.Addr().(*net.UDPAddr).Port),
 				getTLSClientConfig(),
 				getQuicConfig(&quic.Config{MaxIncomingUniStreams: numStreams / 2}),
@@ -446,7 +464,7 @@ var _ = Describe("Stream Cancelations", func() {
 			Expect(err).ToNot(HaveOccurred())
 
 			var wg sync.WaitGroup
-			var counter int32
+			var counter atomic.Int32
 			wg.Add(numStreams)
 			for i := 0; i < numStreams; i++ {
 				go func() {
@@ -477,14 +495,14 @@ var _ = Describe("Stream Cancelations", func() {
 						return
 					}
 
-					atomic.AddInt32(&counter, 1)
+					counter.Add(1)
 					Expect(data).To(Equal(PRData))
 				}()
 			}
 			wg.Wait()
 			Eventually(done).Should(BeClosed())
 
-			count := atomic.LoadInt32(&counter)
+			count := counter.Load()
 			Expect(count).To(BeNumerically(">", numStreams/15))
 			fmt.Fprintf(GinkgoWriter, "Successfully read from %d of %d streams.\n", count, numStreams)
 
@@ -517,6 +535,7 @@ var _ = Describe("Stream Cancelations", func() {
 			}()
 
 			conn, err := quic.DialAddr(
+				context.Background(),
 				fmt.Sprintf("localhost:%d", server.Addr().(*net.UDPAddr).Port),
 				getTLSClientConfig(),
 				getQuicConfig(&quic.Config{MaxIncomingUniStreams: numStreams / 3}),
@@ -524,7 +543,7 @@ var _ = Describe("Stream Cancelations", func() {
 			Expect(err).ToNot(HaveOccurred())
 
 			var numToAccept int
-			var counter int32
+			var counter atomic.Int32
 			var wg sync.WaitGroup
 			wg.Add(numStreams)
 			for numToAccept < numStreams {
@@ -542,7 +561,7 @@ var _ = Describe("Stream Cancelations", func() {
 					str, err := conn.AcceptUniStream(ctx)
 					if err != nil {
 						if err.Error() == "context canceled" {
-							atomic.AddInt32(&counter, 1)
+							counter.Add(1)
 						}
 						return
 					}
@@ -554,7 +573,7 @@ var _ = Describe("Stream Cancelations", func() {
 			}
 			wg.Wait()
 
-			count := atomic.LoadInt32(&counter)
+			count := counter.Load()
 			fmt.Fprintf(GinkgoWriter, "Canceled AcceptStream %d times\n", count)
 			Expect(count).To(BeNumerically(">", numStreams/2))
 			Expect(conn.CloseWithError(0, "")).To(Succeed())
@@ -570,7 +589,7 @@ var _ = Describe("Stream Cancelations", func() {
 			Expect(err).ToNot(HaveOccurred())
 
 			msg := make(chan struct{}, 1)
-			var numCanceled int32
+			var numCanceled atomic.Int32
 			go func() {
 				defer GinkgoRecover()
 				defer close(msg)
@@ -584,7 +603,7 @@ var _ = Describe("Stream Cancelations", func() {
 					str, err := conn.OpenUniStreamSync(ctx)
 					if err != nil {
 						Expect(err).To(MatchError(context.DeadlineExceeded))
-						atomic.AddInt32(&numCanceled, 1)
+						numCanceled.Add(1)
 						select {
 						case msg <- struct{}{}:
 						default:
@@ -602,6 +621,7 @@ var _ = Describe("Stream Cancelations", func() {
 			}()
 
 			conn, err := quic.DialAddr(
+				context.Background(),
 				fmt.Sprintf("localhost:%d", server.Addr().(*net.UDPAddr).Port),
 				getTLSClientConfig(),
 				getQuicConfig(&quic.Config{MaxIncomingUniStreams: maxIncomingStreams}),
@@ -624,7 +644,7 @@ var _ = Describe("Stream Cancelations", func() {
 			}
 			wg.Wait()
 
-			count := atomic.LoadInt32(&numCanceled)
+			count := numCanceled.Load()
 			fmt.Fprintf(GinkgoWriter, "Canceled OpenStreamSync %d times\n", count)
 			Expect(count).To(BeNumerically(">=", numStreams-maxIncomingStreams))
 			Expect(conn.CloseWithError(0, "")).To(Succeed())
@@ -640,6 +660,7 @@ var _ = Describe("Stream Cancelations", func() {
 			getQuicConfig(&quic.Config{MaxIncomingStreams: maxIncomingStreams, MaxIdleTimeout: 10 * time.Second}),
 		)
 		Expect(err).ToNot(HaveOccurred())
+		defer server.Close()
 
 		var wg sync.WaitGroup
 		wg.Add(2 * 4 * maxIncomingStreams)
@@ -695,6 +716,7 @@ var _ = Describe("Stream Cancelations", func() {
 		}()
 
 		conn, err := quic.DialAddr(
+			context.Background(),
 			fmt.Sprintf("localhost:%d", server.Addr().(*net.UDPAddr).Port),
 			getTLSClientConfig(),
 			getQuicConfig(&quic.Config{}),

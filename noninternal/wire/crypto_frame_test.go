@@ -1,7 +1,7 @@
 package wire
 
 import (
-	"bytes"
+	"io"
 
 	"github.com/tumi8/quic-go/noninternal/protocol"
 	"github.com/tumi8/quic-go/quicvarint"
@@ -13,28 +13,26 @@ import (
 var _ = Describe("CRYPTO frame", func() {
 	Context("when parsing", func() {
 		It("parses", func() {
-			data := []byte{0x6}
-			data = append(data, encodeVarInt(0xdecafbad)...) // offset
-			data = append(data, encodeVarInt(6)...)          // length
+			data := encodeVarInt(0xdecafbad)        // offset
+			data = append(data, encodeVarInt(6)...) // length
 			data = append(data, []byte("foobar")...)
-			r := bytes.NewReader(data)
-			frame, err := parseCryptoFrame(r, protocol.Version1)
+			frame, l, err := parseCryptoFrame(data, protocol.Version1)
 			Expect(err).ToNot(HaveOccurred())
 			Expect(frame.Offset).To(Equal(protocol.ByteCount(0xdecafbad)))
 			Expect(frame.Data).To(Equal([]byte("foobar")))
-			Expect(r.Len()).To(BeZero())
+			Expect(l).To(Equal(len(data)))
 		})
 
 		It("errors on EOFs", func() {
-			data := []byte{0x6}
-			data = append(data, encodeVarInt(0xdecafbad)...) // offset
-			data = append(data, encodeVarInt(6)...)          // data length
+			data := encodeVarInt(0xdecafbad)        // offset
+			data = append(data, encodeVarInt(6)...) // data length
 			data = append(data, []byte("foobar")...)
-			_, err := parseCryptoFrame(bytes.NewReader(data), protocol.Version1)
+			_, l, err := parseCryptoFrame(data, protocol.Version1)
 			Expect(err).NotTo(HaveOccurred())
+			Expect(l).To(Equal(len(data)))
 			for i := range data {
-				_, err := parseCryptoFrame(bytes.NewReader(data[0:i]), protocol.Version1)
-				Expect(err).To(HaveOccurred())
+				_, _, err := parseCryptoFrame(data[:i], protocol.Version1)
+				Expect(err).To(MatchError(io.EOF))
 			}
 		})
 	})
@@ -47,7 +45,7 @@ var _ = Describe("CRYPTO frame", func() {
 			}
 			b, err := f.Append(nil, protocol.Version1)
 			Expect(err).ToNot(HaveOccurred())
-			expected := []byte{0x6}
+			expected := []byte{cryptoFrameType}
 			expected = append(expected, encodeVarInt(0x123456)...) // offset
 			expected = append(expected, encodeVarInt(6)...)        // length
 			expected = append(expected, []byte("foobar")...)
@@ -97,7 +95,7 @@ var _ = Describe("CRYPTO frame", func() {
 				Offset: 0x1337,
 				Data:   []byte("foobar"),
 			}
-			Expect(f.Length(protocol.Version1)).To(Equal(1 + quicvarint.Len(0x1337) + quicvarint.Len(6) + 6))
+			Expect(f.Length(protocol.Version1)).To(BeEquivalentTo(1 + quicvarint.Len(0x1337) + quicvarint.Len(6) + 6))
 		})
 	})
 

@@ -2,12 +2,20 @@ package qerr
 
 import (
 	"errors"
+	"fmt"
 	"net"
 
 	"github.com/tumi8/quic-go/noninternal/protocol"
+
 	. "github.com/onsi/ginkgo/v2"
 	. "github.com/onsi/gomega"
 )
+
+type myError int
+
+var _ error = myError(0)
+
+func (e myError) Error() string { return fmt.Sprintf("my error %d", e) }
 
 var _ = Describe("QUIC Errors", func() {
 	Context("Transport Errors", func() {
@@ -15,18 +23,19 @@ var _ = Describe("QUIC Errors", func() {
 			Expect((&TransportError{
 				ErrorCode:    FlowControlError,
 				ErrorMessage: "foobar",
-			}).Error()).To(Equal("FLOW_CONTROL_ERROR: foobar"))
+			}).Error()).To(Equal("FLOW_CONTROL_ERROR (local): foobar"))
 		})
 
 		It("has a string representation for empty error phrases", func() {
-			Expect((&TransportError{ErrorCode: FlowControlError}).Error()).To(Equal("FLOW_CONTROL_ERROR"))
+			Expect((&TransportError{ErrorCode: FlowControlError}).Error()).To(Equal("FLOW_CONTROL_ERROR (local)"))
 		})
 
 		It("includes the frame type, for errors without a message", func() {
 			Expect((&TransportError{
+				Remote:    true,
 				ErrorCode: FlowControlError,
 				FrameType: 0x1337,
-			}).Error()).To(Equal("FLOW_CONTROL_ERROR (frame type: 0x1337)"))
+			}).Error()).To(Equal("FLOW_CONTROL_ERROR (remote) (frame type: 0x1337)"))
 		})
 
 		It("includes the frame type, for errors with a message", func() {
@@ -34,18 +43,26 @@ var _ = Describe("QUIC Errors", func() {
 				ErrorCode:    FlowControlError,
 				FrameType:    0x1337,
 				ErrorMessage: "foobar",
-			}).Error()).To(Equal("FLOW_CONTROL_ERROR (frame type: 0x1337): foobar"))
+			}).Error()).To(Equal("FLOW_CONTROL_ERROR (local) (frame type: 0x1337): foobar"))
 		})
 
 		Context("crypto errors", func() {
 			It("has a string representation for errors with a message", func() {
-				err := NewCryptoError(0x42, "foobar")
-				Expect(err.Error()).To(Equal("CRYPTO_ERROR (0x142): foobar"))
+				myErr := myError(1337)
+				err := NewLocalCryptoError(0x42, myErr)
+				Expect(err.Error()).To(Equal("CRYPTO_ERROR 0x142 (local): my error 1337"))
+			})
+
+			It("unwraps errors", func() {
+				var myErr myError
+				err := NewLocalCryptoError(0x42, myError(1337))
+				Expect(errors.As(err, &myErr)).To(BeTrue())
+				Expect(myErr).To(BeEquivalentTo(1337))
 			})
 
 			It("has a string representation for errors without a message", func() {
-				err := NewCryptoError(0x2a, "")
-				Expect(err.Error()).To(Equal("CRYPTO_ERROR (0x12a): tls: bad certificate"))
+				err := NewLocalCryptoError(0x2a, nil)
+				Expect(err.Error()).To(Equal("CRYPTO_ERROR 0x12a (local): tls: bad certificate"))
 			})
 		})
 	})
@@ -55,13 +72,14 @@ var _ = Describe("QUIC Errors", func() {
 			Expect((&ApplicationError{
 				ErrorCode:    0x42,
 				ErrorMessage: "foobar",
-			}).Error()).To(Equal("Application error 0x42: foobar"))
+			}).Error()).To(Equal("Application error 0x42 (local): foobar"))
 		})
 
 		It("has a string representation for errors without a message", func() {
 			Expect((&ApplicationError{
 				ErrorCode: 0x42,
-			}).Error()).To(Equal("Application error 0x42"))
+				Remote:    true,
+			}).Error()).To(Equal("Application error 0x42 (remote)"))
 		})
 	})
 
@@ -90,8 +108,8 @@ var _ = Describe("QUIC Errors", func() {
 	Context("Version Negotiation errors", func() {
 		It("has a string representation", func() {
 			Expect((&VersionNegotiationError{
-				Ours:   []protocol.VersionNumber{2, 3},
-				Theirs: []protocol.VersionNumber{4, 5, 6},
+				Ours:   []protocol.Version{2, 3},
+				Theirs: []protocol.Version{4, 5, 6},
 			}).Error()).To(Equal("no compatible QUIC version found (we support [0x2 0x3], server offered [0x4 0x5 0x6])"))
 		})
 	})

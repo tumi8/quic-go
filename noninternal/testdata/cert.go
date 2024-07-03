@@ -1,7 +1,7 @@
 package testdata
 
 import (
-	"crypto/tls"
+	tls "github.com/zirngibl/qscanner-tls"
 	"crypto/x509"
 	"os"
 	"path"
@@ -31,6 +31,7 @@ func GetTLSConfig() *tls.Config {
 		panic(err)
 	}
 	return &tls.Config{
+		MinVersion:   tls.VersionTLS13,
 		Certificates: []tls.Certificate{cert},
 	}
 }

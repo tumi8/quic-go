@@ -1,8 +1,8 @@
 package wire
 
 import (
-	"bytes"
 	"fmt"
+	"io"
 
 	"github.com/tumi8/quic-go/noninternal/protocol"
 	"github.com/tumi8/quic-go/quicvarint"
@@ -14,35 +14,32 @@ import (
 var _ = Describe("MAX_STREAMS frame", func() {
 	Context("parsing", func() {
 		It("accepts a frame for a bidirectional stream", func() {
-			data := []byte{0x12}
-			data = append(data, encodeVarInt(0xdecaf)...)
-			b := bytes.NewReader(data)
-			f, err := parseMaxStreamsFrame(b, protocol.VersionWhatever)
+			data := encodeVarInt(0xdecaf)
+			f, l, err := parseMaxStreamsFrame(data, bidiMaxStreamsFrameType, protocol.Version1)
 			Expect(err).ToNot(HaveOccurred())
 			Expect(f.Type).To(Equal(protocol.StreamTypeBidi))
 			Expect(f.MaxStreamNum).To(BeEquivalentTo(0xdecaf))
-			Expect(b.Len()).To(BeZero())
+			Expect(l).To(Equal(len(data)))
 		})
 
 		It("accepts a frame for a bidirectional stream", func() {
-			data := []byte{0x13}
-			data = append(data, encodeVarInt(0xdecaf)...)
-			b := bytes.NewReader(data)
-			f, err := parseMaxStreamsFrame(b, protocol.VersionWhatever)
+			data := encodeVarInt(0xdecaf)
+			f, l, err := parseMaxStreamsFrame(data, uniMaxStreamsFrameType, protocol.Version1)
 			Expect(err).ToNot(HaveOccurred())
 			Expect(f.Type).To(Equal(protocol.StreamTypeUni))
 			Expect(f.MaxStreamNum).To(BeEquivalentTo(0xdecaf))
-			Expect(b.Len()).To(BeZero())
+			Expect(l).To(Equal(len(data)))
 		})
 
 		It("errors on EOFs", func() {
-			data := []byte{0x1d}
-			data = append(data, encodeVarInt(0xdeadbeefcafe13)...)
-			_, err := parseMaxStreamsFrame(bytes.NewReader(data), protocol.VersionWhatever)
+			const typ = 0x1d
+			data := encodeVarInt(0xdeadbeefcafe13)
+			_, l, err := parseMaxStreamsFrame(data, typ, protocol.Version1)
 			Expect(err).NotTo(HaveOccurred())
+			Expect(l).To(Equal(len(data)))
 			for i := range data {
-				_, err := parseMaxStreamsFrame(bytes.NewReader(data[0:i]), protocol.VersionWhatever)
-				Expect(err).To(HaveOccurred())
+				_, _, err := parseMaxStreamsFrame(data[:i], typ, protocol.Version1)
+				Expect(err).To(MatchError(io.EOF))
 			}
 		})
 
@@ -54,9 +51,12 @@ var _ = Describe("MAX_STREAMS frame", func() {
 					Type:         streamType,
 					MaxStreamNum: protocol.MaxStreamCount,
 				}
-				b, err := f.Append(nil, protocol.VersionWhatever)
+				b, err := f.Append(nil, protocol.Version1)
 				Expect(err).ToNot(HaveOccurred())
-				frame, err := parseMaxStreamsFrame(bytes.NewReader(b), protocol.VersionWhatever)
+				typ, l, err := quicvarint.Parse(b)
+				Expect(err).ToNot(HaveOccurred())
+				b = b[l:]
+				frame, _, err := parseMaxStreamsFrame(b, typ, protocol.Version1)
 				Expect(err).ToNot(HaveOccurred())
 				Expect(frame).To(Equal(f))
 			})
@@ -66,9 +66,12 @@ var _ = Describe("MAX_STREAMS frame", func() {
 					Type:         streamType,
 					MaxStreamNum: protocol.MaxStreamCount + 1,
 				}
-				b, err := f.Append(nil, protocol.VersionWhatever)
+				b, err := f.Append(nil, protocol.Version1)
 				Expect(err).ToNot(HaveOccurred())
-				_, err = parseMaxStreamsFrame(bytes.NewReader(b), protocol.VersionWhatever)
+				typ, l, err := quicvarint.Parse(b)
+				Expect(err).ToNot(HaveOccurred())
+				b = b[l:]
+				_, _, err = parseMaxStreamsFrame(b, typ, protocol.Version1)
 				Expect(err).To(MatchError(fmt.Sprintf("%d exceeds the maximum stream count", protocol.MaxStreamCount+1)))
 			})
 		}
@@ -80,9 +83,9 @@ var _ = Describe("MAX_STREAMS frame", func() {
 				Type:         protocol.StreamTypeBidi,
 				MaxStreamNum: 0xdeadbeef,
 			}
-			b, err := f.Append(nil, protocol.VersionWhatever)
+			b, err := f.Append(nil, protocol.Version1)
 			Expect(err).ToNot(HaveOccurred())
-			expected := []byte{0x12}
+			expected := []byte{bidiMaxStreamsFrameType}
 			expected = append(expected, encodeVarInt(0xdeadbeef)...)
 			Expect(b).To(Equal(expected))
 		})
@@ -92,16 +95,16 @@ var _ = Describe("MAX_STREAMS frame", func() {
 				Type:         protocol.StreamTypeUni,
 				MaxStreamNum: 0xdecafbad,
 			}
-			b, err := f.Append(nil, protocol.VersionWhatever)
+			b, err := f.Append(nil, protocol.Version1)
 			Expect(err).ToNot(HaveOccurred())
-			expected := []byte{0x13}
+			expected := []byte{uniMaxStreamsFrameType}
 			expected = append(expected, encodeVarInt(0xdecafbad)...)
 			Expect(b).To(Equal(expected))
 		})
 
 		It("has the correct length", func() {
 			frame := MaxStreamsFrame{MaxStreamNum: 0x1337}
-			Expect(frame.Length(protocol.VersionWhatever)).To(Equal(1 + quicvarint.Len(0x1337)))
+			Expect(frame.Length(protocol.Version1)).To(BeEquivalentTo(1 + quicvarint.Len(0x1337)))
 		})
 	})
 })

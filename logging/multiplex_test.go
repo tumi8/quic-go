@@ -1,14 +1,14 @@
-package logging
+package logging_test
 
 import (
-	"context"
 	"errors"
 	"net"
 	"time"
 
+	mocklogging "github.com/tumi8/quic-go/noninternal/mocks/logging"
 	"github.com/tumi8/quic-go/noninternal/protocol"
 	"github.com/tumi8/quic-go/noninternal/wire"
-
+	. "github.com/quic-go/quic-go/logging"
 
 	. "github.com/onsi/ginkgo/v2"
 	. "github.com/onsi/gomega"
@@ -21,61 +21,22 @@ var _ = Describe("Tracing", func() {
 		})
 
 		It("returns the raw tracer if only one tracer is passed in", func() {
-			tr := NewMockTracer(mockCtrl)
+			tr := &Tracer{}
 			tracer := NewMultiplexedTracer(tr)
-			Expect(tracer).To(BeAssignableToTypeOf(&MockTracer{}))
+			Expect(tracer).To(Equal(tr))
 		})
 
 		Context("tracing events", func() {
 			var (
-				tracer   Tracer
-				tr1, tr2 *MockTracer
+				tracer   *Tracer
+				tr1, tr2 *mocklogging.MockTracer
 			)
 
 			BeforeEach(func() {
-				tr1 = NewMockTracer(mockCtrl)
-				tr2 = NewMockTracer(mockCtrl)
-				tracer = NewMultiplexedTracer(tr1, tr2)
-			})
-
-			It("multiplexes the TracerForConnection call", func() {
-				ctx := context.Background()
-				connID := protocol.ParseConnectionID([]byte{1, 2, 3})
-				tr1.EXPECT().TracerForConnection(ctx, PerspectiveClient, connID)
-				tr2.EXPECT().TracerForConnection(ctx, PerspectiveClient, connID)
-				tracer.TracerForConnection(ctx, PerspectiveClient, connID)
-			})
-
-			It("uses multiple connection tracers", func() {
-				ctx := context.Background()
-				ctr1 := NewMockConnectionTracer(mockCtrl)
-				ctr2 := NewMockConnectionTracer(mockCtrl)
-				connID := protocol.ParseConnectionID([]byte{1, 2, 3})
-				tr1.EXPECT().TracerForConnection(ctx, PerspectiveServer, connID).Return(ctr1)
-				tr2.EXPECT().TracerForConnection(ctx, PerspectiveServer, connID).Return(ctr2)
-				tr := tracer.TracerForConnection(ctx, PerspectiveServer, connID)
-				ctr1.EXPECT().LossTimerCanceled()
-				ctr2.EXPECT().LossTimerCanceled()
-				tr.LossTimerCanceled()
-			})
-
-			It("handles tracers that return a nil ConnectionTracer", func() {
-				ctx := context.Background()
-				ctr1 := NewMockConnectionTracer(mockCtrl)
-				connID := protocol.ParseConnectionID([]byte{1, 2, 3, 4})
-				tr1.EXPECT().TracerForConnection(ctx, PerspectiveServer, connID).Return(ctr1)
-				tr2.EXPECT().TracerForConnection(ctx, PerspectiveServer, connID)
-				tr := tracer.TracerForConnection(ctx, PerspectiveServer, connID)
-				ctr1.EXPECT().LossTimerCanceled()
-				tr.LossTimerCanceled()
-			})
-
-			It("returns nil when all tracers return a nil ConnectionTracer", func() {
-				ctx := context.Background()
-				connID := protocol.ParseConnectionID([]byte{1, 2, 3, 4, 5})
-				tr1.EXPECT().TracerForConnection(ctx, PerspectiveClient, connID)
-				tr2.EXPECT().TracerForConnection(ctx, PerspectiveClient, connID)
-				Expect(tracer.TracerForConnection(ctx, PerspectiveClient, connID)).To(BeNil())
+				var t1, t2 *Tracer
+				t1, tr1 = mocklogging.NewMockTracer(mockCtrl)
+				t2, tr2 = mocklogging.NewMockTracer(mockCtrl)
+				tracer = NewMultiplexedTracer(t1, t2, &Tracer{})
 			})
 
 			It("traces the PacketSent event", func() {
@@ -103,23 +64,36 @@ var _ = Describe("Tracing", func() {
 				tr2.EXPECT().DroppedPacket(remote, PacketTypeRetry, ByteCount(1024), PacketDropDuplicate)
 				tracer.DroppedPacket(remote, PacketTypeRetry, 1024, PacketDropDuplicate)
 			})
+
+			It("traces the Debug event", func() {
+				tr1.EXPECT().Debug("foo", "bar")
+				tr2.EXPECT().Debug("foo", "bar")
+				tracer.Debug("foo", "bar")
+			})
+
+			It("traces the Close event", func() {
+				tr1.EXPECT().Close()
+				tr2.EXPECT().Close()
+				tracer.Close()
+			})
 		})
 	})
 
 	Context("Connection Tracer", func() {
 		var (
-			tracer ConnectionTracer
-			tr1    *MockConnectionTracer
-			tr2    *MockConnectionTracer
+			tracer *ConnectionTracer
+			tr1    *mocklogging.MockConnectionTracer
+			tr2    *mocklogging.MockConnectionTracer
 		)
 
 		BeforeEach(func() {
-			tr1 = NewMockConnectionTracer(mockCtrl)
-			tr2 = NewMockConnectionTracer(mockCtrl)
-			tracer = NewMultiplexedConnectionTracer(tr1, tr2)
+			var t1, t2 *ConnectionTracer
+			t1, tr1 = mocklogging.NewMockConnectionTracer(mockCtrl)
+			t2, tr2 = mocklogging.NewMockConnectionTracer(mockCtrl)
+			tracer = NewMultiplexedConnectionTracer(t1, t2)
 		})
 
-		It("trace the ConnectionStarted event", func() {
+		It("traces the StartedConnection event", func() {
 			local := &net.UDPAddr{IP: net.IPv4(1, 2, 3, 4)}
 			remote := &net.UDPAddr{IP: net.IPv4(4, 3, 2, 1)}
 			dest := protocol.ParseConnectionID([]byte{1, 2, 3, 4})
@@ -127,6 +101,15 @@ var _ = Describe("Tracing", func() {
 			tr1.EXPECT().StartedConnection(local, remote, src, dest)
 			tr2.EXPECT().StartedConnection(local, remote, src, dest)
 			tracer.StartedConnection(local, remote, src, dest)
+		})
+
+		It("traces the NegotiatedVersion event", func() {
+			chosen := protocol.Version2
+			client := []protocol.Version{protocol.Version1}
+			server := []protocol.Version{13, 37}
+			tr1.EXPECT().NegotiatedVersion(chosen, client, server)
+			tr2.EXPECT().NegotiatedVersion(chosen, client, server)
+			tracer.NegotiatedVersion(chosen, client, server)
 		})
 
 		It("traces the ClosedConnection event", func() {
@@ -157,13 +140,22 @@ var _ = Describe("Tracing", func() {
 			tracer.RestoredTransportParameters(tp)
 		})
 
-		It("traces the SentPacket event", func() {
+		It("traces the SentLongHeaderPacket event", func() {
 			hdr := &ExtendedHeader{Header: Header{DestConnectionID: protocol.ParseConnectionID([]byte{1, 2, 3})}}
 			ack := &AckFrame{AckRanges: []AckRange{{Smallest: 1, Largest: 10}}}
 			ping := &PingFrame{}
-			tr1.EXPECT().SentPacket(hdr, ByteCount(1337), ack, []Frame{ping})
-			tr2.EXPECT().SentPacket(hdr, ByteCount(1337), ack, []Frame{ping})
-			tracer.SentPacket(hdr, 1337, ack, []Frame{ping})
+			tr1.EXPECT().SentLongHeaderPacket(hdr, ByteCount(1337), ECTNot, ack, []Frame{ping})
+			tr2.EXPECT().SentLongHeaderPacket(hdr, ByteCount(1337), ECTNot, ack, []Frame{ping})
+			tracer.SentLongHeaderPacket(hdr, 1337, ECTNot, ack, []Frame{ping})
+		})
+
+		It("traces the SentShortHeaderPacket event", func() {
+			hdr := &ShortHeader{DestConnectionID: protocol.ParseConnectionID([]byte{1, 2, 3})}
+			ack := &AckFrame{AckRanges: []AckRange{{Smallest: 1, Largest: 10}}}
+			ping := &PingFrame{}
+			tr1.EXPECT().SentShortHeaderPacket(hdr, ByteCount(1337), ECNCE, ack, []Frame{ping})
+			tr2.EXPECT().SentShortHeaderPacket(hdr, ByteCount(1337), ECNCE, ack, []Frame{ping})
+			tracer.SentShortHeaderPacket(hdr, 1337, ECNCE, ack, []Frame{ping})
 		})
 
 		It("traces the ReceivedVersionNegotiationPacket event", func() {
@@ -184,17 +176,17 @@ var _ = Describe("Tracing", func() {
 		It("traces the ReceivedLongHeaderPacket event", func() {
 			hdr := &ExtendedHeader{Header: Header{DestConnectionID: protocol.ParseConnectionID([]byte{1, 2, 3})}}
 			ping := &PingFrame{}
-			tr1.EXPECT().ReceivedLongHeaderPacket(hdr, ByteCount(1337), []Frame{ping})
-			tr2.EXPECT().ReceivedLongHeaderPacket(hdr, ByteCount(1337), []Frame{ping})
-			tracer.ReceivedLongHeaderPacket(hdr, 1337, []Frame{ping})
+			tr1.EXPECT().ReceivedLongHeaderPacket(hdr, ByteCount(1337), ECT1, []Frame{ping})
+			tr2.EXPECT().ReceivedLongHeaderPacket(hdr, ByteCount(1337), ECT1, []Frame{ping})
+			tracer.ReceivedLongHeaderPacket(hdr, 1337, ECT1, []Frame{ping})
 		})
 
 		It("traces the ReceivedShortHeaderPacket event", func() {
 			hdr := &ShortHeader{DestConnectionID: protocol.ParseConnectionID([]byte{1, 2, 3})}
 			ping := &PingFrame{}
-			tr1.EXPECT().ReceivedShortHeaderPacket(hdr, ByteCount(1337), []Frame{ping})
-			tr2.EXPECT().ReceivedShortHeaderPacket(hdr, ByteCount(1337), []Frame{ping})
-			tracer.ReceivedShortHeaderPacket(hdr, 1337, []Frame{ping})
+			tr1.EXPECT().ReceivedShortHeaderPacket(hdr, ByteCount(1337), ECT0, []Frame{ping})
+			tr2.EXPECT().ReceivedShortHeaderPacket(hdr, ByteCount(1337), ECT0, []Frame{ping})
+			tracer.ReceivedShortHeaderPacket(hdr, 1337, ECT0, []Frame{ping})
 		})
 
 		It("traces the BufferedPacket event", func() {
@@ -204,9 +196,15 @@ var _ = Describe("Tracing", func() {
 		})
 
 		It("traces the DroppedPacket event", func() {
-			tr1.EXPECT().DroppedPacket(PacketTypeInitial, ByteCount(1337), PacketDropHeaderParseError)
-			tr2.EXPECT().DroppedPacket(PacketTypeInitial, ByteCount(1337), PacketDropHeaderParseError)
-			tracer.DroppedPacket(PacketTypeInitial, 1337, PacketDropHeaderParseError)
+			tr1.EXPECT().DroppedPacket(PacketTypeInitial, PacketNumber(42), ByteCount(1337), PacketDropHeaderParseError)
+			tr2.EXPECT().DroppedPacket(PacketTypeInitial, PacketNumber(42), ByteCount(1337), PacketDropHeaderParseError)
+			tracer.DroppedPacket(PacketTypeInitial, 42, 1337, PacketDropHeaderParseError)
+		})
+
+		It("traces the UpdatedMTU event", func() {
+			tr1.EXPECT().UpdatedMTU(ByteCount(1337), true)
+			tr2.EXPECT().UpdatedMTU(ByteCount(1337), true)
+			tracer.UpdatedMTU(1337, true)
 		})
 
 		It("traces the UpdatedCongestionState event", func() {

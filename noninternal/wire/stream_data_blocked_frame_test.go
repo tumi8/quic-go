@@ -1,7 +1,8 @@
 package wire
 
 import (
-	"bytes"
+	"io"
+
 
 	"github.com/tumi8/quic-go/noninternal/protocol"
 	"github.com/tumi8/quic-go/quicvarint"
@@ -13,26 +14,24 @@ import (
 var _ = Describe("STREAM_DATA_BLOCKED frame", func() {
 	Context("parsing", func() {
 		It("accepts sample frame", func() {
-			data := []byte{0x15}
-			data = append(data, encodeVarInt(0xdeadbeef)...) // stream ID
+			data := encodeVarInt(0xdeadbeef)                 // stream ID
 			data = append(data, encodeVarInt(0xdecafbad)...) // offset
-			b := bytes.NewReader(data)
-			frame, err := parseStreamDataBlockedFrame(b, protocol.Version1)
+			frame, l, err := parseStreamDataBlockedFrame(data, protocol.Version1)
 			Expect(err).ToNot(HaveOccurred())
 			Expect(frame.StreamID).To(Equal(protocol.StreamID(0xdeadbeef)))
 			Expect(frame.MaximumStreamData).To(Equal(protocol.ByteCount(0xdecafbad)))
-			Expect(b.Len()).To(BeZero())
+			Expect(l).To(Equal(len(data)))
 		})
 
 		It("errors on EOFs", func() {
-			data := []byte{0x15}
-			data = append(data, encodeVarInt(0xdeadbeef)...)
+			data := encodeVarInt(0xdeadbeef)
 			data = append(data, encodeVarInt(0xc0010ff)...)
-			_, err := parseStreamDataBlockedFrame(bytes.NewReader(data), protocol.Version1)
+			_, l, err := parseStreamDataBlockedFrame(data, protocol.Version1)
 			Expect(err).NotTo(HaveOccurred())
+			Expect(l).To(Equal(len(data)))
 			for i := range data {
-				_, err := parseStreamDataBlockedFrame(bytes.NewReader(data[0:i]), protocol.Version1)
-				Expect(err).To(HaveOccurred())
+				_, _, err := parseStreamDataBlockedFrame(data[:i], protocol.Version1)
+				Expect(err).To(MatchError(io.EOF))
 			}
 		})
 	})
@@ -43,7 +42,7 @@ var _ = Describe("STREAM_DATA_BLOCKED frame", func() {
 				StreamID:          0x1337,
 				MaximumStreamData: 0xdeadbeef,
 			}
-			Expect(f.Length(0)).To(Equal(1 + quicvarint.Len(0x1337) + quicvarint.Len(0xdeadbeef)))
+			Expect(f.Length(0)).To(BeEquivalentTo(1 + quicvarint.Len(0x1337) + quicvarint.Len(0xdeadbeef)))
 		})
 
 		It("writes a sample frame", func() {
@@ -53,7 +52,7 @@ var _ = Describe("STREAM_DATA_BLOCKED frame", func() {
 			}
 			b, err := f.Append(nil, protocol.Version1)
 			Expect(err).ToNot(HaveOccurred())
-			expected := []byte{0x15}
+			expected := []byte{streamDataBlockedFrameType}
 			expected = append(expected, encodeVarInt(uint64(f.StreamID))...)
 			expected = append(expected, encodeVarInt(uint64(f.MaximumStreamData))...)
 			Expect(b).To(Equal(expected))

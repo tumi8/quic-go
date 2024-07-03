@@ -1,7 +1,7 @@
 package wire
 
 import (
-	"bytes"
+	"io"
 
 	"github.com/tumi8/quic-go/noninternal/protocol"
 	"github.com/tumi8/quic-go/quicvarint"
@@ -14,34 +14,30 @@ var _ = Describe("NEW_TOKEN frame", func() {
 	Context("parsing", func() {
 		It("accepts a sample frame", func() {
 			token := "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua."
-			data := []byte{0x7}
-			data = append(data, encodeVarInt(uint64(len(token)))...)
+			data := encodeVarInt(uint64(len(token)))
 			data = append(data, token...)
-			b := bytes.NewReader(data)
-			f, err := parseNewTokenFrame(b, protocol.VersionWhatever)
+			f, l, err := parseNewTokenFrame(data, protocol.Version1)
 			Expect(err).ToNot(HaveOccurred())
 			Expect(string(f.Token)).To(Equal(token))
-			Expect(b.Len()).To(BeZero())
+			Expect(l).To(Equal(len(data)))
 		})
 
 		It("rejects empty tokens", func() {
-			data := []byte{0x7}
-			data = append(data, encodeVarInt(uint64(0))...)
-			b := bytes.NewReader(data)
-			_, err := parseNewTokenFrame(b, protocol.VersionWhatever)
+			data := encodeVarInt(0)
+			_, _, err := parseNewTokenFrame(data, protocol.Version1)
 			Expect(err).To(MatchError("token must not be empty"))
 		})
 
 		It("errors on EOFs", func() {
 			token := "Lorem ipsum dolor sit amet, consectetur adipiscing elit"
-			data := []byte{0x7}
-			data = append(data, encodeVarInt(uint64(len(token)))...)
+			data := encodeVarInt(uint64(len(token)))
 			data = append(data, token...)
-			_, err := parseNewTokenFrame(bytes.NewReader(data), protocol.VersionWhatever)
+			_, l, err := parseNewTokenFrame(data, protocol.Version1)
 			Expect(err).NotTo(HaveOccurred())
+			Expect(l).To(Equal(len(data)))
 			for i := range data {
-				_, err := parseNewTokenFrame(bytes.NewReader(data[0:i]), protocol.VersionWhatever)
-				Expect(err).To(HaveOccurred())
+				_, _, err := parseNewTokenFrame(data[:i], protocol.Version1)
+				Expect(err).To(MatchError(io.EOF))
 			}
 		})
 	})
@@ -50,9 +46,9 @@ var _ = Describe("NEW_TOKEN frame", func() {
 		It("writes a sample frame", func() {
 			token := "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat."
 			f := &NewTokenFrame{Token: []byte(token)}
-			b, err := f.Append(nil, protocol.VersionWhatever)
+			b, err := f.Append(nil, protocol.Version1)
 			Expect(err).ToNot(HaveOccurred())
-			expected := []byte{0x7}
+			expected := []byte{newTokenFrameType}
 			expected = append(expected, encodeVarInt(uint64(len(token)))...)
 			expected = append(expected, token...)
 			Expect(b).To(Equal(expected))
@@ -60,7 +56,7 @@ var _ = Describe("NEW_TOKEN frame", func() {
 
 		It("has the correct min length", func() {
 			frame := &NewTokenFrame{Token: []byte("foobar")}
-			Expect(frame.Length(protocol.VersionWhatever)).To(Equal(1 + quicvarint.Len(6) + 6))
+			Expect(frame.Length(protocol.Version1)).To(BeEquivalentTo(1 + quicvarint.Len(6) + 6))
 		})
 	})
 })

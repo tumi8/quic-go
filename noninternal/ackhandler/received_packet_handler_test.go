@@ -3,14 +3,13 @@ package ackhandler
 import (
 	"time"
 
-	"github.com/golang/mock/gomock"
-
 	"github.com/tumi8/quic-go/noninternal/protocol"
 	"github.com/tumi8/quic-go/noninternal/utils"
 	"github.com/tumi8/quic-go/noninternal/wire"
 
 	. "github.com/onsi/ginkgo/v2"
 	. "github.com/onsi/gomega"
+	"go.uber.org/mock/gomock"
 )
 
 var _ = Describe("Received Packet Handler", func() {
@@ -19,12 +18,7 @@ var _ = Describe("Received Packet Handler", func() {
 
 	BeforeEach(func() {
 		sentPackets = NewMockSentPacketTracker(mockCtrl)
-		handler = newReceivedPacketHandler(
-			sentPackets,
-			&utils.RTTStats{},
-			utils.DefaultLogger,
-			protocol.VersionWhatever,
-		)
+		handler = newReceivedPacketHandler(sentPackets, utils.DefaultLogger)
 	})
 
 	It("generates ACKs for different packet number spaces", func() {

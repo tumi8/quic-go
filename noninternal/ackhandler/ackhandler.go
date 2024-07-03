@@ -14,11 +14,11 @@ func NewAckHandler(
 	initialMaxDatagramSize protocol.ByteCount,
 	rttStats *utils.RTTStats,
 	clientAddressValidated bool,
+	enableECN bool,
 	pers protocol.Perspective,
-	tracer logging.ConnectionTracer,
+	tracer *logging.ConnectionTracer,
 	logger utils.Logger,
-	version protocol.VersionNumber,
 ) (SentPacketHandler, ReceivedPacketHandler) {
-	sph := newSentPacketHandler(initialPacketNumber, initialMaxDatagramSize, rttStats, clientAddressValidated, pers, tracer, logger)
-	return sph, newReceivedPacketHandler(sph, rttStats, logger, version)
+	sph := newSentPacketHandler(initialPacketNumber, initialMaxDatagramSize, rttStats, clientAddressValidated, enableECN, pers, tracer, logger)
+	return sph, newReceivedPacketHandler(sph, logger)
 }

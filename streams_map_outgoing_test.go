@@ -4,16 +4,18 @@ import (
 	"context"
 	"errors"
 	"fmt"
-	"math/rand"
 	"sort"
 	"sync"
 	"time"
 
-	"github.com/golang/mock/gomock"
+	"golang.org/x/exp/rand"
+
 	"github.com/tumi8/quic-go/noninternal/protocol"
 	"github.com/tumi8/quic-go/noninternal/wire"
+
 	. "github.com/onsi/ginkgo/v2"
 	. "github.com/onsi/gomega"
+	"go.uber.org/mock/gomock"
 )
 
 var _ = Describe("Streams Map (outgoing)", func() {
@@ -31,7 +33,7 @@ var _ = Describe("Streams Map (outgoing)", func() {
 			m.mutex.Lock()
 			defer m.mutex.Unlock()
 			return len(m.openQueue)
-		}, 50*time.Millisecond, 100*time.Microsecond).Should(Equal(n))
+		}, scaleDuration(100*time.Millisecond), scaleDuration(10*time.Microsecond)).Should(Equal(n))
 	}
 
 	BeforeEach(func() {
@@ -359,8 +361,7 @@ var _ = Describe("Streams Map (outgoing)", func() {
 				Expect(bf.StreamLimit).To(BeEquivalentTo(6))
 			})
 			_, err := m.OpenStream()
-			Expect(err).To(HaveOccurred())
-			Expect(err.Error()).To(Equal(errTooManyOpenStreams.Error()))
+			Expect(err).To(MatchError(&StreamLimitReachedError{}))
 		})
 
 		It("only sends one STREAMS_BLOCKED frame for one stream ID", func() {
@@ -409,7 +410,7 @@ var _ = Describe("Streams Map (outgoing)", func() {
 
 	Context("randomized tests", func() {
 		It("opens streams", func() {
-			rand.Seed(GinkgoRandomSeed())
+			rand.Seed(uint64(GinkgoRandomSeed()))
 			const n = 100
 			fmt.Fprintf(GinkgoWriter, "Opening %d streams concurrently.\n", n)
 
@@ -450,8 +451,7 @@ var _ = Describe("Streams Map (outgoing)", func() {
 				}
 				str, err := m.OpenStream()
 				if limit <= n {
-					Expect(err).To(HaveOccurred())
-					Expect(err.Error()).To(Equal(errTooManyOpenStreams.Error()))
+					Expect(err).To(MatchError(&StreamLimitReachedError{}))
 				} else {
 					Expect(str.num).To(Equal(protocol.StreamNum(n + 1)))
 				}
@@ -460,7 +460,7 @@ var _ = Describe("Streams Map (outgoing)", func() {
 		})
 
 		It("opens streams, when some of them are getting canceled", func() {
-			rand.Seed(GinkgoRandomSeed())
+			rand.Seed(uint64(GinkgoRandomSeed()))
 			const n = 100
 			fmt.Fprintf(GinkgoWriter, "Opening %d streams concurrently.\n", n)
 

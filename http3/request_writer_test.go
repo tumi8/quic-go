@@ -5,11 +5,10 @@ import (
 	"io"
 	"net/http"
 
-
 	mockquic "github.com/tumi8/quic-go/noninternal/mocks/quic"
-	"github.com/tumi8/quic-go/noninternal/utils"
-	"github.com/golang/mock/gomock"
-	"github.com/marten-seemann/qpack"
+
+	"github.com/quic-go/qpack"
+	"go.uber.org/mock/gomock"
 
 	. "github.com/onsi/ginkgo/v2"
 	. "github.com/onsi/gomega"
@@ -23,7 +22,8 @@ var _ = Describe("Request Writer", func() {
 	)
 
 	decode := func(str io.Reader) map[string]string {
-		frame, err := parseNextFrame(str, nil)
+		fp := frameParser{r: str}
+		frame, err := fp.ParseNext()
 		ExpectWithOffset(1, err).ToNot(HaveOccurred())
 		ExpectWithOffset(1, frame).To(BeAssignableToTypeOf(&headersFrame{}))
 		headersFrame := frame.(*headersFrame)
@@ -41,7 +41,7 @@ var _ = Describe("Request Writer", func() {
 	}
 
 	BeforeEach(func() {
-		rw = newRequestWriter(utils.DefaultLogger)
+		rw = newRequestWriter()
 		strBuf = &bytes.Buffer{}
 		str = mockquic.NewMockStream(mockCtrl)
 		str.EXPECT().Write(gomock.Any()).DoAndReturn(strBuf.Write).AnyTimes()
@@ -57,6 +57,13 @@ var _ = Describe("Request Writer", func() {
 		Expect(headerFields).To(HaveKeyWithValue(":path", "/index.html?foo=bar"))
 		Expect(headerFields).To(HaveKeyWithValue(":scheme", "https"))
 		Expect(headerFields).ToNot(HaveKey("accept-encoding"))
+	})
+
+	It("rejects invalid host headers", func() {
+		req, err := http.NewRequest(http.MethodGet, "https://quic.clemente.io/index.html?foo=bar", nil)
+		Expect(err).ToNot(HaveOccurred())
+		req.Host = "foo@bar" // @ is invalid
+		Expect(rw.WriteRequestHeader(str, req, false)).To(MatchError("http3: invalid Host header"))
 	})
 
 	It("sends cookies", func() {

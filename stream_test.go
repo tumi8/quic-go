@@ -1,6 +1,7 @@
 package quic
 
 import (
+	"context"
 	"errors"
 	"io"
 	"os"
@@ -10,6 +11,7 @@ import (
 	"github.com/tumi8/quic-go/noninternal/mocks"
 	"github.com/tumi8/quic-go/noninternal/protocol"
 	"github.com/tumi8/quic-go/noninternal/wire"
+
 	. "github.com/onsi/ginkgo/v2"
 	. "github.com/onsi/gomega"
 	"github.com/onsi/gomega/gbytes"
@@ -40,7 +42,7 @@ var _ = Describe("Stream", func() {
 	BeforeEach(func() {
 		mockSender = NewMockStreamSender(mockCtrl)
 		mockFC = mocks.NewMockStreamFlowController(mockCtrl)
-		str = newStream(streamID, mockSender, mockFC, protocol.VersionWhatever)
+		str = newStream(context.Background(), streamID, mockSender, mockFC)
 
 		timeout := scaleDuration(250 * time.Millisecond)
 		strWithTimeout = struct {

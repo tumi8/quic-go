@@ -10,7 +10,6 @@ import (
 	"github.com/tumi8/quic-go/logging"
 
 	"github.com/francoispqt/gojay"
-
 	. "github.com/onsi/ginkgo/v2"
 	. "github.com/onsi/gomega"
 )

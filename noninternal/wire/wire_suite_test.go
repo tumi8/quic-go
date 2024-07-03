@@ -1,7 +1,6 @@
 package wire
 
 import (
-	"bytes"
 	"encoding/binary"
 	"testing"
 
@@ -18,12 +17,10 @@ func TestWire(t *testing.T) {
 }
 
 func encodeVarInt(i uint64) []byte {
-	b := &bytes.Buffer{}
-	quicvarint.Write(b, i)
-	return b.Bytes()
+	return quicvarint.Append(nil, i)
 }
 
-func appendVersion(data []byte, v protocol.VersionNumber) []byte {
+func appendVersion(data []byte, v protocol.Version) []byte {
 	offset := len(data)
 	data = append(data, []byte{0, 0, 0, 0}...)
 	binary.BigEndian.PutUint32(data[offset:], uint32(v))
