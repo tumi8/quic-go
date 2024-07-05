@@ -3,8 +3,7 @@ package quic
 import (
 	"bytes"
 	"context"
-	"crypto/tls"
-	"github.com/zirngibl/qscanner-tls"
+	tls "github.com/zirngibl/qscanner-tls"
 	"errors"
 	"fmt"
 	"io"
@@ -1078,7 +1077,7 @@ func (s *connection) handleRetryPacket(hdr *wire.Header, data []byte, rcvTime ti
 	}
 	newDestConnID := hdr.SrcConnectionID
 
-	s.receivedRetry = true
+	s.ReceivedRetry = true
 	if err := s.sentPacketHandler.ResetForRetry(rcvTime); err != nil {
 		s.closeLocal(err)
 		return false
@@ -1705,14 +1704,14 @@ func (s *connection) handleTransportParameters(params *wire.TransportParameters)
 		}
 	}
 
-	if s.perspective == protocol.PerspectiveClient && s.peerParams != nil && s.ConnectionState().Used0RTT && !params.ValidForUpdate(s.peerParams) {
+	if s.perspective == protocol.PerspectiveClient && s.PeerParams != nil && s.ConnectionState().Used0RTT && !params.ValidForUpdate(s.PeerParams) {
 		return &qerr.TransportError{
 			ErrorCode:    qerr.ProtocolViolation,
 			ErrorMessage: "server sent reduced limits after accepting 0-RTT data",
 		}
 	}
 
-	s.peerParams = params
+	s.PeerParams = params
 	// On the client side we have to wait for handshake completion.
 	// During a 0-RTT connection, we are only allowed to use the new transport parameters for 1-RTT packets.
 	if s.perspective == protocol.PerspectiveServer {
@@ -2398,7 +2397,7 @@ func (s *connection) SendDatagram(p []byte) error {
 	// The payload size estimate is conservative.
 	// Under many circumstances we could send a few more bytes.
 	maxDataLen := min(
-		f.MaxDataLen(s.peerParams.MaxDatagramFrameSize, s.version),
+		f.MaxDataLen(s.PeerParams.MaxDatagramFrameSize, s.version),
 		protocol.ByteCount(s.maxPayloadSizeEstimate.Load()),
 	)
 	if protocol.ByteCount(len(p)) > maxDataLen {

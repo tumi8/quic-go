@@ -7,8 +7,8 @@ import (
 	"time"
 
 
-	"github.com/quic-go/quic-go/internal/protocol"
-	"github.com/quic-go/quic-go/internal/utils"
+	"github.com/tumi8/quic-go/noninternal/protocol"
+	"github.com/tumi8/quic-go/noninternal/utils"
 )
 
 // Connection is a UDP connection

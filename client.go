@@ -2,9 +2,8 @@ package quic
 
 import (
 	"context"
-	"crypto/tls"
+	tls "github.com/zirngibl/qscanner-tls"
 	"fmt"
-	"github.com/zirngibl/qscanner-tls"
 	"errors"
 	"net"
 
@@ -165,28 +164,13 @@ func dial(
 }
 
 func newClient(
-	pconn net.PacketConn,
-	remoteAddr net.Addr,
+	sendConn sendConn,
+	connIDGenerator ConnectionIDGenerator,
 	config *Config,
 	tlsConf *tls.Config,
-	host string,
+	onClose func(),
 	use0RTT bool,
-	createdPacketConn bool,
 ) (*client, error) {
-	if tlsConf == nil {
-		tlsConf = &tls.Config{}
-	} else {
-		tlsConf = tlsConf.Clone()
-	}
-	if tlsConf.ServerName == "" {
-		sni, _, err := net.SplitHostPort(host)
-		if err != nil {
-			// It's ok if net.SplitHostPort returns an error - it could be a hostname/IP address without a port.
-			sni = host
-		}
-
-		tlsConf.ServerName = sni
-	}
 
 	// check that all versions are actually supported
 	if config != nil {
@@ -203,7 +187,7 @@ func newClient(
 	if config.SCID != (protocol.ConnectionID{}) {
 		srcConnID = config.SCID
 	} else {
-		srcConnID, err = config.ConnectionIDGenerator.GenerateConnectionID()
+		srcConnID, err = generateConnectionIDForInitial()
 		if err != nil {
 			return nil, err
 		}

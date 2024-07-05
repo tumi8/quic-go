@@ -2,7 +2,7 @@ package self_test
 
 import (
 	"context"
-	"crypto/tls"
+	tls "github.com/zirngibl/qscanner-tls"
 	"fmt"
 	"io"
 	"net"

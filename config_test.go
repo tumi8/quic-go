@@ -122,8 +122,6 @@ var _ = Describe("Config", func() {
 				f.Set(reflect.ValueOf(uint16(1350)))
 			case "DisablePathMTUDiscovery":
 				f.Set(reflect.ValueOf(true))
-			case "Tracer":
-				f.Set(reflect.ValueOf(mocklogging.NewMockTracer(mockCtrl)))
 			case "SCID":
 			case "DCID":
 			case "Allow0RTT":

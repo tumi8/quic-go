@@ -89,6 +89,10 @@ func (m *MockQUICConn) AcceptUniStream(arg0 context.Context) (ReceiveStream, err
 	return ret0, ret1
 }
 
+func (m *MockQUICConn) GetConnection() (* connection) {
+	return nil
+}
+
 // AcceptUniStream indicates an expected call of AcceptUniStream.
 func (mr *MockQUICConnMockRecorder) AcceptUniStream(arg0 any) *MockQUICConnAcceptUniStreamCall {
 	mr.mock.ctrl.T.Helper()
@@ -125,10 +129,6 @@ func (m *MockQUICConn) CloseWithError(arg0 qerr.ApplicationErrorCode, arg1 strin
 	ret := m.ctrl.Call(m, "CloseWithError", arg0, arg1)
 	ret0, _ := ret[0].(error)
 	return ret0
-}
-
-func (m *MockQuicConn) GetConnection() *connection {
-	return m.GetConnection()
 }
 
 // CloseWithError indicates an expected call of CloseWithError.

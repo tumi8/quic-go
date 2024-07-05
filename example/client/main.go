@@ -2,7 +2,7 @@ package main
 
 import (
 	"bytes"
-	"crypto/tls"
+	tls "github.com/zirngibl/qscanner-tls"
 	"crypto/x509"
 	"flag"
 	"io"
@@ -13,7 +13,7 @@ import (
 
 	"github.com/tumi8/quic-go"
 	"github.com/tumi8/quic-go/http3"
-	"github.com/tumi8/quic-go/internal/testdata"
+	"github.com/tumi8/quic-go/noninternal/testdata"
 	"github.com/tumi8/quic-go/qlog"
 )
 

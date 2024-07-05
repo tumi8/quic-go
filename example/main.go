@@ -17,7 +17,7 @@ import (
 
 	"github.com/tumi8/quic-go"
 	"github.com/tumi8/quic-go/http3"
-	"github.com/tumi8/quic-go/internal/testdata"
+	"github.com/tumi8/quic-go/noninternal/testdata"
 	"github.com/tumi8/quic-go/qlog"
 )
 

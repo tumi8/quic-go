@@ -8,7 +8,7 @@ import (
 	mocklogging "github.com/tumi8/quic-go/noninternal/mocks/logging"
 	"github.com/tumi8/quic-go/noninternal/protocol"
 	"github.com/tumi8/quic-go/noninternal/wire"
-	. "github.com/quic-go/quic-go/logging"
+	. "github.com/tumi8/quic-go/logging"
 
 	. "github.com/onsi/ginkgo/v2"
 	. "github.com/onsi/gomega"

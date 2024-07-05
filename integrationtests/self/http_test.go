@@ -5,7 +5,7 @@ import (
 	"bytes"
 	"compress/gzip"
 	"context"
-	"crypto/tls"
+	tls "github.com/zirngibl/qscanner-tls"
 	"encoding/binary"
 	"errors"
 	"fmt"

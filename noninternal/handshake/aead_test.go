@@ -5,7 +5,7 @@ import (
 	"crypto/aes"
 	"crypto/cipher"
 	"crypto/rand"
-	"crypto/tls"
+	tls "github.com/zirngibl/qscanner-tls"
 	"fmt"
 
 	"github.com/tumi8/quic-go/noninternal/protocol"

@@ -2,8 +2,9 @@ package handshake
 
 import (
 	"crypto"
-	"crypto/tls"
+	tls "github.com/zirngibl/qscanner-tls"
 
+	"golang.org/x/crypto/hkdf"
 
 	"github.com/tumi8/quic-go/noninternal/protocol"
 )

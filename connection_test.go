@@ -2487,12 +2487,12 @@ var _ = Describe("Connection", func() {
 
 	Context("datagrams", func() {
 		It("doesn't allow datagrams if the peer didn't enable support", func() {
-			conn.peerParams = &wire.TransportParameters{MaxDatagramFrameSize: 0}
+			conn.PeerParams = &wire.TransportParameters{MaxDatagramFrameSize: 0}
 			Expect(conn.SendDatagram(make([]byte, 200))).To(MatchError("datagram support disabled"))
 		})
 
 		It("sends a datagram", func() {
-			conn.peerParams = &wire.TransportParameters{MaxDatagramFrameSize: 1000}
+			conn.PeerParams = &wire.TransportParameters{MaxDatagramFrameSize: 1000}
 			Expect(conn.SendDatagram([]byte("foobar"))).To(Succeed())
 			f := conn.datagramQueue.Peek()
 			Expect(f).ToNot(BeNil())
@@ -2500,7 +2500,7 @@ var _ = Describe("Connection", func() {
 		})
 
 		It("says when a datagram is too big", func() {
-			conn.peerParams = &wire.TransportParameters{MaxDatagramFrameSize: 1000}
+			conn.PeerParams = &wire.TransportParameters{MaxDatagramFrameSize: 1000}
 			err := conn.SendDatagram(make([]byte, 2000))
 			Expect(err).To(HaveOccurred())
 			Expect(err).To(BeAssignableToTypeOf(&DatagramTooLargeError{}))
@@ -3092,7 +3092,7 @@ var _ = Describe("Client Connection", func() {
 
 		It("errors if the transport parameters contain reduced limits after knowing 0-RTT data is accepted by the server", func() {
 			conn.perspective = protocol.PerspectiveClient
-			conn.peerParams = &wire.TransportParameters{
+			conn.PeerParams = &wire.TransportParameters{
 				ActiveConnectionIDLimit:        3,
 				InitialMaxData:                 0x5000,
 				InitialMaxStreamDataBidiLocal:  0x5000,

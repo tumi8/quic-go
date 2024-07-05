@@ -2,7 +2,7 @@ package http3
 
 import (
 	"context"
-	"crypto/tls"
+	tls "github.com/zirngibl/qscanner-tls"
 	"errors"
 	"fmt"
 	"io"

@@ -1,7 +1,7 @@
 package testdata
 
 import (
-	"crypto/tls"
+	tls "github.com/zirngibl/qscanner-tls"
 	"io"
 
 	. "github.com/onsi/ginkgo/v2"
