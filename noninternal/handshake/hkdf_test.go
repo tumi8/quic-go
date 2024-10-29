@@ -20,10 +20,10 @@ type cipherSuiteTLS13 struct {
 	Hash   crypto.Hash
 }
 
-//go:linkname cipherSuiteTLS13ByID crypto/tls.cipherSuiteTLS13ByID
+//go:linkname cipherSuiteTLS13ByID github.com/zirngibl/qscanner-tls.cipherSuiteTLS13ByID
 func cipherSuiteTLS13ByID(id uint16) *cipherSuiteTLS13
 
-//go:linkname expandLabel crypto/tls.(*cipherSuiteTLS13).expandLabel
+//go:linkname expandLabel github.com/zirngibl/qscanner-tls.(*cipherSuiteTLS13).expandLabel
 func expandLabel(cs *cipherSuiteTLS13, secret []byte, label string, context []byte, length int) []byte
 
 var _ = Describe("HKDF", func() {

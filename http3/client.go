@@ -336,8 +336,8 @@ func (c *SingleDestinationRoundTripper) doRequest(req *http.Request, str *reques
 		}
 		break
 	}
-	connState := c.hconn.ConnectionState().TLS
-	res.TLS = &connState
+	//connState := c.hconn.ConnectionState().TLS
+	res.TLS = nil //&connState
 	res.Request = req
 	return res, nil
 }

@@ -2,9 +2,9 @@ package http3
 
 import (
 	"context"
-	tls "github.com/zirngibl/qscanner-tls"
 	"errors"
 	"fmt"
+	tls "github.com/zirngibl/qscanner-tls"
 	"io"
 	"log/slog"
 	"net"
@@ -553,8 +553,8 @@ func (s *Server) handleRequest(conn *connection, str quic.Stream, datagrams *dat
 		return
 	}
 
-	connState := conn.ConnectionState().TLS
-	req.TLS = &connState
+	//connState := conn.ConnectionState().TLS
+	req.TLS = nil //&connState
 	req.RemoteAddr = conn.RemoteAddr().String()
 
 	// Check that the client doesn't send more data in DATA frames than indicated by the Content-Length header (if set).

@@ -2,16 +2,16 @@ package versionnegotiation
 
 import (
 	"context"
-	"tls "github.com/zirngibl/qscanner-tls"
 	"errors"
 	"fmt"
+	"github.com/zirngibl/qscanner-tls"
 	"net"
 	"time"
 
 	"github.com/tumi8/quic-go"
 	"github.com/tumi8/quic-go/integrationtests/tools/israce"
-	"github.com/tumi8/quic-go/noninternal/protocol"
 	"github.com/tumi8/quic-go/logging"
+	"github.com/tumi8/quic-go/noninternal/protocol"
 
 	. "github.com/onsi/ginkgo/v2"
 	. "github.com/onsi/gomega"

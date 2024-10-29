@@ -3,9 +3,9 @@ package quic
 import (
 	"bytes"
 	"context"
-	tls "github.com/zirngibl/qscanner-tls"
 	"errors"
 	"fmt"
+	tls "github.com/zirngibl/qscanner-tls"
 	"io"
 	"net"
 	"reflect"
@@ -13,6 +13,7 @@ import (
 	"sync/atomic"
 	"time"
 
+	"github.com/tumi8/quic-go/logging"
 	"github.com/tumi8/quic-go/noninternal/ackhandler"
 	"github.com/tumi8/quic-go/noninternal/flowcontrol"
 	"github.com/tumi8/quic-go/noninternal/handshake"
@@ -21,7 +22,6 @@ import (
 	"github.com/tumi8/quic-go/noninternal/qerr"
 	"github.com/tumi8/quic-go/noninternal/utils"
 	"github.com/tumi8/quic-go/noninternal/wire"
-	"github.com/tumi8/quic-go/logging"
 )
 
 type unpacker interface {
