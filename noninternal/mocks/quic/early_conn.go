@@ -21,6 +21,7 @@ import (
 
 // MockEarlyConnection is a mock of EarlyConnection interface.
 type MockEarlyConnection struct {
+	quic.Connection
 	ctrl     *gomock.Controller
 	recorder *MockEarlyConnectionMockRecorder
 	isgomock struct{}
@@ -235,10 +236,6 @@ func (c *MockEarlyConnectionContextCall) DoAndReturn(f func() context.Context) *
 	return c
 }
 
-// GetConnection mocks base method.
-func (m *MockEarlyConnection) GetConnection() *quic.Connection {
-	return nil
-}
 
 // GetConnection indicates an expected call of GetConnection.
 func (mr *MockEarlyConnectionMockRecorder) GetConnection() *MockEarlyConnectionGetConnectionCall {

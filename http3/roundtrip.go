@@ -2,9 +2,9 @@ package http3
 
 import (
 	"context"
-	tls "github.com/zirngibl/qscanner-tls"
 	"errors"
 	"fmt"
+	tls "github.com/zirngibl/qscanner-tls"
 	"io"
 	"net"
 	"net/http"
@@ -13,9 +13,9 @@ import (
 
 	"sync/atomic"
 
-	"golang.org/x/net/http/httpguts"
 	"github.com/tumi8/quic-go"
 	"github.com/tumi8/quic-go/noninternal/protocol"
+	"golang.org/x/net/http/httpguts"
 )
 
 // Settings are HTTP/3 settings that apply to the underlying connection.
@@ -271,6 +271,10 @@ func (r *RoundTripper) getClient(ctx context.Context, hostname string, onlyCache
 	}
 	cl.useCount.Add(1)
 	return cl, isReused, nil
+}
+
+func (r *RoundTripper) GetConnection(hostname string) (conn quic.EarlyConnection, err error) {
+	return r.clients[hostname].conn, nil
 }
 
 func (r *RoundTripper) dial(ctx context.Context, hostname string) (quic.EarlyConnection, singleRoundTripper, error) {
