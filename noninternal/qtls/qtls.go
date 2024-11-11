@@ -2,7 +2,7 @@ package qtls
 
 import (
 	"bytes"
-	tls "github.com/zirngibl/qscanner-tls"
+	tls "crypto/tls"
 	"fmt"
 	"net"
 
@@ -37,7 +37,7 @@ func SetupConfigForServer(
 	origUnwrapSession := conf.UnwrapSession
 	// UnwrapSession might be called multiple times, as the client can use multiple session tickets.
 	// However, using 0-RTT is only possible with the first session ticket.
-	// github.com/zirngibl/qscanner-tls guarantees that this callback is called in the same order as the session ticket in the ClientHello.
+	// crypto/tls guarantees that this callback is called in the same order as the session ticket in the ClientHello.
 	var unwrapCount int
 	conf.UnwrapSession = func(identity []byte, connState tls.ConnectionState) (*tls.SessionState, error) {
 		unwrapCount++
@@ -62,7 +62,7 @@ func SetupConfigForServer(
 		return state, nil
 	}
 	// The tls.Config contains two callbacks that pass in a tls.ClientHelloInfo.
-	// Since github.com/zirngibl/qscanner-tls doesn't do it, we need to make sure to set the Conn field with a fake net.Conn
+	// Since crypto/tls doesn't do it, we need to make sure to set the Conn field with a fake net.Conn
 	// that allows the caller to get the local and the remote address.
 	if conf.GetConfigForClient != nil {
 		gcfc := conf.GetConfigForClient

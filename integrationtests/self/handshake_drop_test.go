@@ -2,7 +2,7 @@ package self_test
 
 import (
 	"context"
-	tls "github.com/zirngibl/qscanner-tls"
+	tls "crypto/tls"
 	"fmt"
 	"io"
 	mrand "math/rand"

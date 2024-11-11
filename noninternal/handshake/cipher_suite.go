@@ -4,7 +4,7 @@ import (
 	"crypto"
 	"crypto/aes"
 	"crypto/cipher"
-	tls "github.com/zirngibl/qscanner-tls"
+	tls "crypto/tls"
 	"fmt"
 
 	"golang.org/x/crypto/chacha20poly1305"

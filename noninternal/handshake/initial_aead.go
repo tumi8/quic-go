@@ -2,7 +2,7 @@ package handshake
 
 import (
 	"crypto"
-	tls "github.com/zirngibl/qscanner-tls"
+	tls "crypto/tls"
 
 	"golang.org/x/crypto/hkdf"
 

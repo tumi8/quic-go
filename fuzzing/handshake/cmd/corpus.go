@@ -2,7 +2,7 @@ package main
 
 import (
 	"context"
-	tls "github.com/zirngibl/qscanner-tls"
+	tls "crypto/tls"
 	"log"
 
 	"net"

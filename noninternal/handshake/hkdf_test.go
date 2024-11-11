@@ -3,8 +3,9 @@ package handshake
 import (
 	"crypto"
 	"crypto/cipher"
-	tls "github.com/zirngibl/qscanner-tls"
+	"crypto/tls"
 	"testing"
+	"unsafe"
 	_ "unsafe"
 
 	"golang.org/x/exp/rand"
@@ -20,10 +21,20 @@ type cipherSuiteTLS13 struct {
 	Hash   crypto.Hash
 }
 
-//go:linkname cipherSuiteTLS13ByID github.com/zirngibl/qscanner-tls.cipherSuiteTLS13ByID
-func cipherSuiteTLS13ByID(id uint16) *cipherSuiteTLS13
+//go:linkname cipherSuitesTLS13 crypto/tls.cipherSuitesTLS13
+var cipherSuitesTLS13 []unsafe.Pointer
 
-//go:linkname expandLabel github.com/zirngibl/qscanner-tls.(*cipherSuiteTLS13).expandLabel
+func cipherSuiteTLS13ByID(id uint16) *cipherSuiteTLS13 {
+	for _, v := range cipherSuitesTLS13 {
+		cs := (*cipherSuiteTLS13)(v)
+		if cs.ID == id {
+			return cs
+		}
+	}
+	return nil
+}
+
+//go:linkname expandLabel crypto/tls.(*cipherSuiteTLS13).expandLabel
 func expandLabel(cs *cipherSuiteTLS13, secret []byte, label string, context []byte, length int) []byte
 
 var _ = Describe("HKDF", func() {

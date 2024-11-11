@@ -3,7 +3,7 @@ package self_test
 import (
 	"bytes"
 	"context"
-	tls "github.com/zirngibl/qscanner-tls"
+	tls "crypto/tls"
 	"crypto/x509"
 	"flag"
 	"fmt"

@@ -1,7 +1,7 @@
 package qerr
 
 import (
-	tls "github.com/zirngibl/qscanner-tls"
+	tls "crypto/tls"
 	"fmt"
 
 )

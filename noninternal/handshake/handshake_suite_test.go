@@ -1,7 +1,7 @@
 package handshake
 
 import (
-	tls "github.com/zirngibl/qscanner-tls"
+	"crypto/tls"
 	"encoding/hex"
 	"strings"
 	"testing"

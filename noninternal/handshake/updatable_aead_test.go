@@ -2,7 +2,7 @@ package handshake
 
 import (
 	"crypto/rand"
-	tls "github.com/zirngibl/qscanner-tls"
+	tls "crypto/tls"
 	"fmt"
 	"testing"
 	"time"

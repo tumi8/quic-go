@@ -33,14 +33,11 @@ type streamMapping struct {
 }
 
 func expectTooManyStreamsError(err error) {
-	ExpectWithOffset(1, err).To(MatchError(&StreamLimitReachedError{}))
+	ExpectWithOffset(1, err).To(HaveOccurred())
+	ExpectWithOffset(1, err.Error()).To(Equal(errTooManyOpenStreams.Error()))
 	nerr, ok := err.(net.Error)
 	ExpectWithOffset(1, ok).To(BeTrue())
 	ExpectWithOffset(1, nerr.Timeout()).To(BeFalse())
-	//nolint:staticcheck // SA1019
-	// In older versions of quic-go, the stream limit error was documented to be a net.Error.Temporary.
-	// This function was since deprecated, but we keep the existing behavior.
-	ExpectWithOffset(1, nerr.Temporary()).To(BeTrue())
 }
 
 var _ = Describe("Streams Map", func() {

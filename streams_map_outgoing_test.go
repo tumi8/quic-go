@@ -361,7 +361,8 @@ var _ = Describe("Streams Map (outgoing)", func() {
 				Expect(bf.StreamLimit).To(BeEquivalentTo(6))
 			})
 			_, err := m.OpenStream()
-			Expect(err).To(MatchError(&StreamLimitReachedError{}))
+			Expect(err).To(HaveOccurred())
+			Expect(err.Error()).To(Equal(errTooManyOpenStreams.Error()))
 		})
 
 		It("only sends one STREAMS_BLOCKED frame for one stream ID", func() {
@@ -451,7 +452,8 @@ var _ = Describe("Streams Map (outgoing)", func() {
 				}
 				str, err := m.OpenStream()
 				if limit <= n {
-					Expect(err).To(MatchError(&StreamLimitReachedError{}))
+					Expect(err).To(HaveOccurred())
+					Expect(err.Error()).To(Equal(errTooManyOpenStreams.Error()))
 				} else {
 					Expect(str.num).To(Equal(protocol.StreamNum(n + 1)))
 				}

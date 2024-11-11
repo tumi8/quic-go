@@ -3,7 +3,7 @@ package http3
 import (
 	"bytes"
 	"context"
-	tls "github.com/zirngibl/qscanner-tls"
+	tls "crypto/tls"
 	"errors"
 	"io"
 	"net/http"

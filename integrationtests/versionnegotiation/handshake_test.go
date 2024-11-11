@@ -4,7 +4,7 @@ import (
 	"context"
 	"errors"
 	"fmt"
-	"github.com/zirngibl/qscanner-tls"
+	"crypto/tls"
 	"net"
 	"time"
 

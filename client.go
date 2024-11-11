@@ -2,7 +2,7 @@ package quic
 
 import (
 	"context"
-	tls "github.com/zirngibl/qscanner-tls"
+	"crypto/tls"
 	"fmt"
 	"errors"
 	"net"

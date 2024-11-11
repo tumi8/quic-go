@@ -4,7 +4,7 @@ import (
 	"context"
 	"errors"
 	"fmt"
-	tls "github.com/zirngibl/qscanner-tls"
+	tls "crypto/tls"
 	"io"
 	"net"
 	"net/http"

@@ -3,7 +3,7 @@ package handshake
 import (
 	"crypto"
 	"crypto/cipher"
-	tls "github.com/zirngibl/qscanner-tls"
+	tls "crypto/tls"
 	"encoding/binary"
 	"fmt"
 	"time"

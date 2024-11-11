@@ -4,7 +4,7 @@ import (
 	"bytes"
 	"context"
 	"crypto/rand"
-	"github.com/zirngibl/qscanner-tls"
+	"crypto/tls"
 	"errors"
 	"fmt"
 	"io"

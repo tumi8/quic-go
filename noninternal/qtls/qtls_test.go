@@ -1,7 +1,7 @@
 package qtls
 
 import (
-	"github.com/zirngibl/qscanner-tls"
+	"crypto/tls"
 	"net"
 	"reflect"
 
@@ -11,7 +11,7 @@ import (
 	. "github.com/onsi/gomega"
 )
 
-var _ = Describe("interface go github.com/zirngibl/qscanner-tls", func() {
+var _ = Describe("interface go crypto/tls", func() {
 	It("converts to tls.EncryptionLevel", func() {
 		Expect(ToTLSEncryptionLevel(protocol.EncryptionInitial)).To(Equal(tls.QUICEncryptionLevelInitial))
 		Expect(ToTLSEncryptionLevel(protocol.EncryptionHandshake)).To(Equal(tls.QUICEncryptionLevelHandshake))

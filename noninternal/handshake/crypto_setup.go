@@ -2,7 +2,7 @@ package handshake
 
 import (
 	"context"
-	tls "github.com/zirngibl/qscanner-tls"
+	tls "crypto/tls"
 	"errors"
 	"fmt"
 	"net"

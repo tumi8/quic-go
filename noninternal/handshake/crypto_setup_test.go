@@ -4,7 +4,7 @@ import (
 	"context"
 	"crypto/rand"
 	"crypto/rsa"
-	tls "github.com/zirngibl/qscanner-tls"
+	tls "crypto/tls"
 	"crypto/x509"
 	"crypto/x509/pkix"
 	"math/big"

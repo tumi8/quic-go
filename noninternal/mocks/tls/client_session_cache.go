@@ -10,7 +10,7 @@
 package mocktls
 
 import (
-	tls "github.com/zirngibl/qscanner-tls"
+	tls "crypto/tls"
 	reflect "reflect"
 
 	gomock "go.uber.org/mock/gomock"

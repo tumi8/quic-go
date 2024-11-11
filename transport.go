@@ -3,7 +3,7 @@ package quic
 import (
 	"context"
 	"crypto/rand"
-	tls "github.com/zirngibl/qscanner-tls"
+	"crypto/tls"
 	"errors"
 	"net"
 	"sync"
