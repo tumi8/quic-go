@@ -10,12 +10,12 @@ import (
 	"sync/atomic"
 	"time"
 
+	"github.com/tumi8/quic-go/logging"
 	"github.com/tumi8/quic-go/noninternal/protocol"
 	"github.com/tumi8/quic-go/noninternal/qerr"
 	"github.com/tumi8/quic-go/noninternal/qtls"
 	"github.com/tumi8/quic-go/noninternal/utils"
 	"github.com/tumi8/quic-go/noninternal/wire"
-	"github.com/tumi8/quic-go/logging"
 	"github.com/tumi8/quic-go/quicvarint"
 )
 
@@ -253,10 +253,7 @@ func (h *cryptoSetup) handleEvent(ev tls.QUICEvent) (done bool, err error) {
 		h.handshakeComplete()
 		return false, nil
 	default:
-		// Unknown events should be ignored.
-		// crypto/tls will ensure that this is safe to do.
-		// See the discussion following https://github.com/golang/go/issues/68124#issuecomment-2187042510 for details.
-		return false, nil
+		return false, fmt.Errorf("unexpected event: %d", ev.Kind)
 	}
 }
 

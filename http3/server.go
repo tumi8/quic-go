@@ -2,9 +2,9 @@ package http3
 
 import (
 	"context"
+	tls "crypto/tls"
 	"errors"
 	"fmt"
-	tls "crypto/tls"
 	"io"
 	"log/slog"
 	"net"
@@ -216,13 +216,7 @@ type Server struct {
 //
 // If s.Addr is blank, ":https" is used.
 func (s *Server) ListenAndServe() error {
-	ln, err := s.setupListenerForConn(s.TLSConfig, nil)
-	if err != nil {
-		return err
-	}
-	defer s.removeListener(&ln)
-
-	return s.serveListener(ln)
+	return s.serveConn(s.TLSConfig, nil)
 }
 
 // ListenAndServeTLS listens on the UDP address s.Addr and calls s.Handler to handle HTTP/3 requests on incoming connections.
@@ -237,26 +231,17 @@ func (s *Server) ListenAndServeTLS(certFile, keyFile string) error {
 	}
 	// We currently only use the cert-related stuff from tls.Config,
 	// so we don't need to make a full copy.
-	ln, err := s.setupListenerForConn(&tls.Config{Certificates: certs}, nil)
-	if err != nil {
-		return err
+	config := &tls.Config{
+		Certificates: certs,
 	}
-	defer s.removeListener(&ln)
-
-	return s.serveListener(ln)
+	return s.serveConn(config, nil)
 }
 
 // Serve an existing UDP connection.
 // It is possible to reuse the same connection for outgoing connections.
 // Closing the server does not close the connection.
 func (s *Server) Serve(conn net.PacketConn) error {
-	ln, err := s.setupListenerForConn(s.TLSConfig, conn)
-	if err != nil {
-		return err
-	}
-	defer s.removeListener(&ln)
-
-	return s.serveListener(ln)
+	return s.serveConn(s.TLSConfig, conn)
 }
 
 // ServeQUICConn serves a single QUIC connection.
@@ -270,18 +255,11 @@ func (s *Server) ServeQUICConn(conn quic.Connection) error {
 // Closing the server does close the listener.
 // ServeListener always returns a non-nil error. After Shutdown or Close, the returned error is http.ErrServerClosed.
 func (s *Server) ServeListener(ln QUICEarlyListener) error {
-	s.mutex.Lock()
 	if err := s.addListener(&ln); err != nil {
-		s.mutex.Unlock()
 		return err
 	}
-	s.mutex.Unlock()
 	defer s.removeListener(&ln)
 
-	return s.serveListener(ln)
-}
-
-func (s *Server) serveListener(ln QUICEarlyListener) error {
 	for {
 		conn, err := ln.Accept(context.Background())
 		if err == quic.ErrServerClosed {
@@ -302,9 +280,17 @@ func (s *Server) serveListener(ln QUICEarlyListener) error {
 
 var errServerWithoutTLSConfig = errors.New("use of http3.Server without TLSConfig")
 
-func (s *Server) setupListenerForConn(tlsConf *tls.Config, conn net.PacketConn) (QUICEarlyListener, error) {
+func (s *Server) serveConn(tlsConf *tls.Config, conn net.PacketConn) error {
 	if tlsConf == nil {
-		return nil, errServerWithoutTLSConfig
+		return errServerWithoutTLSConfig
+	}
+
+	s.mutex.Lock()
+	closed := s.closed
+	s.mutex.Unlock()
+	if closed {
+		return http.ErrServerClosed
+
 	}
 
 	baseConf := ConfigureTLSConfig(tlsConf)
@@ -316,13 +302,6 @@ func (s *Server) setupListenerForConn(tlsConf *tls.Config, conn net.PacketConn) 
 	}
 	if s.EnableDatagrams {
 		quicConf.EnableDatagrams = true
-	}
-
-	s.mutex.Lock()
-	defer s.mutex.Unlock()
-	closed := s.closed
-	if closed {
-		return nil, http.ErrServerClosed
 	}
 
 	var ln QUICEarlyListener
@@ -337,12 +316,9 @@ func (s *Server) setupListenerForConn(tlsConf *tls.Config, conn net.PacketConn) 
 		ln, err = quicListen(conn, baseConf, quicConf)
 	}
 	if err != nil {
-		return nil, err
+		return err
 	}
-	if err := s.addListener(&ln); err != nil {
-		return nil, err
-	}
-	return ln, nil
+	return s.ServeListener(ln)
 }
 
 func extractPort(addr string) (int, error) {
@@ -418,6 +394,9 @@ func (s *Server) generateAltSvcHeader() {
 // call trackListener via Serve and can track+defer untrack the same pointer to
 // local variable there. We never need to compare a Listener from another caller.
 func (s *Server) addListener(l *QUICEarlyListener) error {
+	s.mutex.Lock()
+	defer s.mutex.Unlock()
+
 	if s.closed {
 		return http.ErrServerClosed
 	}
@@ -553,8 +532,8 @@ func (s *Server) handleRequest(conn *connection, str quic.Stream, datagrams *dat
 		return
 	}
 
-	//connState := conn.ConnectionState().TLS
-	req.TLS = nil //&connState
+	connState := conn.ConnectionState().TLS
+	req.TLS = &connState
 	req.RemoteAddr = conn.RemoteAddr().String()
 
 	// Check that the client doesn't send more data in DATA frames than indicated by the Content-Length header (if set).

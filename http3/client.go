@@ -337,10 +337,7 @@ func (c *SingleDestinationRoundTripper) doRequest(req *http.Request, str *reques
 		break
 	}
 	connState := c.hconn.ConnectionState().TLS
-	if !connState.HandshakeComplete {
-		res.TLS = nil
-	}
-	res.TLS = nil //&connState
+	res.TLS = &connState
 	res.Request = req
 	return res, nil
 }

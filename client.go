@@ -3,7 +3,6 @@ package quic
 import (
 	"context"
 	"crypto/tls"
-	"fmt"
 	"errors"
 	"net"
 
@@ -163,43 +162,14 @@ func dial(
 	return c.conn, nil
 }
 
-func newClient(
-	sendConn sendConn,
-	connIDGenerator ConnectionIDGenerator,
-	config *Config,
-	tlsConf *tls.Config,
-	onClose func(),
-	use0RTT bool,
-) (*client, error) {
-
-	// check that all versions are actually supported
-	if config != nil {
-		for _, v := range config.Versions {
-			if !protocol.IsValidVersion(v) {
-				return nil, fmt.Errorf("%s is not a valid QUIC version", v)
-			}
-		}
+func newClient(sendConn sendConn, connIDGenerator ConnectionIDGenerator, config *Config, tlsConf *tls.Config, onClose func(), use0RTT bool) (*client, error) {
+	srcConnID, err := connIDGenerator.GenerateConnectionID()
+	if err != nil {
+		return nil, err
 	}
-
-
-	var srcConnID, destConnID protocol.ConnectionID
-	var err error
-	if config.SCID != (protocol.ConnectionID{}) {
-		srcConnID = config.SCID
-	} else {
-		srcConnID, err = generateConnectionIDForInitial()
-		if err != nil {
-			return nil, err
-		}
-	}
-
-	if config.DCID != (protocol.ConnectionID{}) {
-		destConnID = config.DCID
-	} else {
-		destConnID, err = generateConnectionIDForInitial()
-		if err != nil {
-			return nil, err
-		}
+	destConnID, err := generateConnectionIDForInitial()
+	if err != nil {
+		return nil, err
 	}
 	c := &client{
 		connIDGenerator: connIDGenerator,

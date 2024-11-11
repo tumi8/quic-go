@@ -2,7 +2,7 @@ package qtls
 
 import (
 	"bytes"
-	tls "crypto/tls"
+	"crypto/tls"
 	"fmt"
 	"net"
 
